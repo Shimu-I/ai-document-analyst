@@ -1,0 +1,19 @@
+flowchart TD
+  Q["Where should it run?"] --> A{"Are the documents confidential?"}
+  A -- "yes" --> L["Run locally<br/>virtual environment or Docker<br/>nothing leaves the computer"]
+  A -- "no, only a demo is needed" --> B{"Own GitHub repository<br/>and no credit card?"}
+  B -- "yes" --> SC["Streamlit Community Cloud<br/>requirements.txt + packages.txt<br/>free, public by default"]
+  B -- "need an always-on API" --> R["Render free web service (Docker)<br/>sleeps after 15 min idle,<br/>cold start about a minute"]
+  B -. other host .-> HF["Hugging Face Spaces<br/>free CPU hardware for new Docker spaces<br/>reported to need a paid plan in 2026<br/>(verify before relying on it)"]
+  B -- "need full control" --> V["Free-tier virtual machine<br/>+ docker compose up<br/>(card verification usually required)"]
+  L --> N["Share by file: send the .md files<br/>or a short-lived tunnel to a local page"]
+  SC --> W["Warning: uploads go to a third party<br/>and the page has no login"]
+  R --> W
+  V --> W
+
+  classDef ok fill:#e6f4ea,stroke:#2e8b57,color:#1b2430
+  classDef step fill:#e8f0fe,stroke:#3b6fd4,color:#1b2430
+  classDef warn fill:#fff4e0,stroke:#d98e04,color:#1b2430
+  class L,N ok
+  class SC,R,V step
+  class W,HF warn

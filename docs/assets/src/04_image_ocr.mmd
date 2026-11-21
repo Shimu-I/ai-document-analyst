@@ -1,0 +1,15 @@
+flowchart LR
+  A["Image<br/>PNG JPG WEBP<br/>TIFF BMP GIF"] --> P["Prepare<br/>fix EXIF rotation<br/>transparent to white<br/>dark to light (invert)<br/>contrast, resize<br/>1400 to 5000 px"]
+  P --> R1["Tesseract<br/>page mode 3"]
+  R1 --> Q{"Mean confidence<br/>90+ and 3+ words?"}
+  Q -- "yes" --> W
+  Q -- "no" --> R2["Also try modes<br/>6 and 4, keep the<br/>most confident"]
+  R2 --> W["Words with<br/>position, size,<br/>confidence"]
+  W --> L["Rebuild layout<br/>lines, wrapped lines re-joined<br/>1. and - become lists<br/>tall lines become headings"]
+  L --> C["Confidence report<br/>and doubtful words"]
+  C --> OUT["Markdown text<br/>+ cost of the image<br/>as an image"]
+
+  classDef step fill:#e8f0fe,stroke:#3b6fd4,color:#1b2430
+  classDef ok fill:#e6f4ea,stroke:#2e8b57,color:#1b2430
+  class P,R1,R2,W,L,C step
+  class OUT ok

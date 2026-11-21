@@ -1,0 +1,21 @@
+flowchart TB
+  subgraph R1["Foundations: read the files"]
+    direction LR
+    P0["0 Setup<br/>repo, venv, git"] --> P1["1 Core types<br/>ConvertedDocument,<br/>Markdown helpers"] --> P2["2 Easy formats<br/>text, CSV"] --> P3["3 Office<br/>DOCX, XLSX, PPTX"] --> P4["4 PDF<br/>lines, headings,<br/>tables, columns"]
+  end
+  subgraph R2["Capabilities: more inputs, fewer tokens, understanding"]
+    direction LR
+    P5["5 OCR<br/>scans, images"] --> P6["6 Data formats<br/>JSON, YAML,<br/>XML, HTML"] --> P7["7 Token tools<br/>compact, split"] --> P8["8 Analysis<br/>type, summary"] --> P9["9 Service layer"]
+  end
+  subgraph R3["Delivery: use it, trust it, share it"]
+    direction LR
+    P10["10 CLI"] --> P11["11 API +<br/>web page"] --> P12["12 Tests and<br/>evaluation"] --> P13["13 Docker and<br/>deployment"] --> P14["14 Docs, README,<br/>push to GitHub"]
+  end
+  R1 --> R2 --> R3
+
+  classDef a fill:#e8f0fe,stroke:#3b6fd4,color:#1b2430
+  classDef b fill:#e6f4ea,stroke:#2e8b57,color:#1b2430
+  classDef c fill:#fff4e0,stroke:#d98e04,color:#1b2430
+  class P0,P1,P2,P3,P4 a
+  class P5,P6,P7,P8,P9 b
+  class P10,P11,P12,P13,P14 c

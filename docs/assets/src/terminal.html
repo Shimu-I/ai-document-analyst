@@ -1,0 +1,24 @@
+<!doctype html><meta charset=utf-8><style>
+*{box-sizing:border-box;margin:0}body{width:1200px;background:#0e1420;font-family:'DejaVu Sans Mono',monospace}
+.bar{height:44px;background:#1a2233;display:flex;align-items:center;gap:9px;padding-left:18px}.bar i{width:14px;height:14px;border-radius:50%;display:block}
+pre{color:#d7e0f0;font-size:18px;line-height:1.5;padding:26px 30px 30px;white-space:pre-wrap}
+</style><div class=bar><i style=background:#ff5f57></i><i style=background:#febc2e></i><i style=background:#28c840></i></div>
+<pre><span style="color:#7ee787">$ python -m src.cli data/samples/paper_two_column.pdf --max-tokens 1500 -o out/</span>
+data/samples/paper_two_column.pdf  -&gt;  out/paper_two_column_part1.md   [Research paper, 1,664 words, ~945 tokens]
+data/samples/paper_two_column.pdf  -&gt;  out/paper_two_column_part2.md   [Research paper, 1,664 words, ~1,241 tokens]
+data/samples/paper_two_column.pdf  -&gt;  out/paper_two_column_part3.md   [Research paper, 1,664 words, ~418 tokens]
+
+<span style="color:#7ee787">$ python -m src.cli users.json --compact --stdout | head -7</span>
+count: 40
+
+## users
+
+id | name | email | active | address.city | address.zip | tags
+1 | User 1 | user1@example.com | false | Sylhet | 1001 | [&quot;b&quot;,&quot;d&quot;]
+2 | User 2 | user2@example.com | true | Khulna | 1002 | [&quot;a&quot;,&quot;c&quot;]
+
+<span style="color:#7ee787">$ python -m src.cli sheet.gsheet</span>
+<span style="color:#ff9b8f">FAILED  sheet.gsheet: A .gsheet file is only a shortcut to a Google Sheet in Google Drive; it </span>
+<span style="color:#ff9b8f">contains no data. Open it in Google, use File &gt; Download &gt; Microsoft Excel (.xlsx) or </span>
+<span style="color:#ff9b8f">Comma-separated values (.csv), and upload that file instead.</span>
+</pre>

@@ -1,0 +1,25 @@
+sequenceDiagram
+  autonumber
+  actor U as User
+  participant FE as Web page / API / CLI
+  participant SV as service.process()
+  participant CV as convert()
+  participant AN as analyze()
+  U->>FE: upload file + options (compact, max_tokens, OCR language)
+  FE->>SV: bytes, filename, options
+  SV->>SV: reject empty files and files over the size limit
+  SV->>CV: bytes, filename, options
+  CV->>CV: pick converter by extension (pdf, office, image, structured)
+  CV-->>SV: ConvertedDocument (Markdown, stats, warnings)
+  Note over CV,SV: compact mode runs here, after conversion
+  SV->>AN: ConvertedDocument
+  AN->>AN: classify, then summarize (extractive by default)
+  opt AI summary switched on
+    AN->>AN: ask the model, reject numbers that are not in the document
+  end
+  AN-->>SV: type, confidence, cues, summary, outline
+  SV-->>FE: result dict (markdown, analysis, stats, warnings)
+  FE->>SV: output_files(result)
+  Note over FE,SV: with max_tokens set, the Markdown is split into parts here
+  SV-->>FE: one .md file, or several parts
+  FE-->>U: download .md (or .zip of parts)

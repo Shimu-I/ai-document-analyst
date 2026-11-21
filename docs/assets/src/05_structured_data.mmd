@@ -1,0 +1,18 @@
+flowchart TD
+  A["JSON / JSONL / YAML / TOML / XML"] --> B["Parse into Python objects<br/>XML attributes become @name keys, text becomes #text"]
+  B --> C{"Compact mode?"}
+  C -- "yes" --> D["Drop null, empty-string and empty-container values<br/>and report how much was removed"]
+  C -- "no" --> E
+  D --> E{"JSON mode"}
+  E -- "minified" --> M["One line of exact JSON in a code block"]
+  E -- "readable" --> F{"What is the value?"}
+  F -- "list of 2 or more dicts,<br/>half or more keys shared,<br/>at most 30 columns" --> T["One Markdown table<br/>each key written once, nested keys flattened as a.b"]
+  F -- "dict" --> K["key: value lines<br/>top-level containers become ## sections"]
+  F -- "short list of simple values" --> S["a, b, c on one line"]
+  F -- "text with line breaks" --> ML["key: | and the indented lines"]
+  F -- "deeper than 12 levels" --> J["Compact inline JSON for the rest"]
+
+  classDef step fill:#e8f0fe,stroke:#3b6fd4,color:#1b2430
+  classDef ok fill:#e6f4ea,stroke:#2e8b57,color:#1b2430
+  class B,D,T,K,S,ML,J step
+  class M ok

@@ -1,0 +1,26 @@
+flowchart TD
+  A["Markdown + file kind"] --> B{"Kind decides the type?"}
+  B -- "JSON, YAML, XML, TOML,<br/>notebook, code, HTML" --> T1["Type from the format, confidence high"]
+  B -- "spreadsheet or CSV" --> T2["Financial / contact list / data spreadsheet<br/>from word counts"]
+  B -- "text document, slides, image" --> T3["Keyword cues with weights<br/>nine document types<br/>each cue counted at most 3 times"]
+  T3 --> T4{"Score high enough?"}
+  T4 -- "no" --> T5["General document, or Image with text<br/>confidence low"]
+  T4 -- "yes" --> T6["Best type + confidence<br/>(high, medium, low) + matched cues"]
+
+  A --> S{"Summary method by kind"}
+  S -- "spreadsheet, data, code, notebook" --> S1["Structural summary<br/>sheets and columns, sections, definitions"]
+  S -- "slides" --> S2["Slide count and titles + 2 sentences"]
+  S -- "text" --> S3["Extractive summary<br/>prefer the Abstract / Summary section<br/>score sentences by word frequency, keep 4"]
+  S3 --> LQ{"AI summary switched on<br/>and a model configured?"}
+  LQ -- "no" --> OUT["Summary shown (cannot invent facts)"]
+  LQ -- "yes" --> LM["Model writes summary and key points"]
+  LM --> CK{"Every number of 3+ characters<br/>appears in the document?"}
+  CK -- "yes" --> OUT2["Model summary accepted"]
+  CK -- "no" --> OUT3["Rejected, extractive summary kept<br/>warning shown"]
+
+  classDef step fill:#e8f0fe,stroke:#3b6fd4,color:#1b2430
+  classDef ok fill:#e6f4ea,stroke:#2e8b57,color:#1b2430
+  classDef bad fill:#fdecea,stroke:#c0392b,color:#1b2430
+  class T1,T2,T3,T5,T6,S1,S2,S3,LM step
+  class OUT,OUT2 ok
+  class OUT3 bad

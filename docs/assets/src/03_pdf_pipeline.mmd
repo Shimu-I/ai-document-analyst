@@ -1,0 +1,22 @@
+flowchart LR
+  A["PDF bytes"] --> B{"Opens?"}
+  B -- "password or<br/>corrupt" --> E1["Clear error"]
+  B -- "yes" --> C["Per page<br/>read words with<br/>position, font size,<br/>font name"]
+  C --> D{"Text layer?<br/>20+ characters"}
+  D -- "no, or<br/>force OCR" --> O["Render at 250 dpi<br/>Tesseract OCR<br/>paragraphs, lists"]
+  D -- "yes" --> T["Find tables<br/>ruled grids and<br/>horizontal-rule tables"]
+  T --> G{"Two columns?<br/>empty gutter<br/>in the middle"}
+  G -- "yes" --> L1["Left column,<br/>then right column"]
+  G -- "no" --> L2["Top to bottom"]
+  L1 --> X
+  L2 --> X
+  O --> X["Remove repeated<br/>headers, footers,<br/>page numbers"]
+  X --> Y["Assemble Markdown<br/>headings from font size,<br/>lists, code, re-joined lines,<br/>hyphenation repaired"]
+  Y --> Z["Markdown +<br/>warnings"]
+
+  classDef step fill:#e8f0fe,stroke:#3b6fd4,color:#1b2430
+  classDef bad fill:#fdecea,stroke:#c0392b,color:#1b2430
+  classDef ok fill:#e6f4ea,stroke:#2e8b57,color:#1b2430
+  class C,T,L1,L2,O,X,Y step
+  class E1 bad
+  class Z ok

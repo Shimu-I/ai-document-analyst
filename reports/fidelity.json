@@ -1,0 +1,162 @@
+{
+  "report.pdf": {
+    "ours": {
+      "word_recall": 1.0,
+      "word_precision": 0.978,
+      "order": 1.0,
+      "headings": "6/6",
+      "tables": "1/1",
+      "list_items": "6/6",
+      "tokens": 386
+    },
+    "markitdown": {
+      "word_recall": 0.986,
+      "word_precision": 0.982,
+      "order": 0.786,
+      "headings": "0/6",
+      "tables": "0/1",
+      "list_items": "3/6",
+      "tokens": 366
+    }
+  },
+  "report.docx": {
+    "ours": {
+      "word_recall": 1.0,
+      "word_precision": 1.0,
+      "order": 1.0,
+      "headings": "6/6",
+      "tables": "1/1",
+      "list_items": "6/6",
+      "tokens": 376
+    },
+    "markitdown": {
+      "word_recall": 1.0,
+      "word_precision": 1.0,
+      "order": 1.0,
+      "headings": "5/6",
+      "tables": "1/1",
+      "list_items": "6/6",
+      "tokens": 376
+    }
+  },
+  "paper_two_column.pdf": {
+    "ours": {
+      "word_recall": 1.0,
+      "word_precision": 1.0,
+      "order": 1.0,
+      "headings": "8/8",
+      "tables": "0/0",
+      "list_items": "0/0",
+      "tokens": 2593
+    },
+    "markitdown": {
+      "word_recall": 0.998,
+      "word_precision": 0.991,
+      "order": 0.929,
+      "headings": "0/8",
+      "tables": "0/0",
+      "list_items": "0/0",
+      "tokens": 2624
+    }
+  },
+  "paper_two_column.docx": {
+    "ours": {
+      "word_recall": 1.0,
+      "word_precision": 1.0,
+      "order": 1.0,
+      "headings": "8/8",
+      "tables": "0/0",
+      "list_items": "0/0",
+      "tokens": 2593
+    },
+    "markitdown": {
+      "word_recall": 1.0,
+      "word_precision": 1.0,
+      "order": 1.0,
+      "headings": "7/8",
+      "tables": "0/0",
+      "list_items": "0/0",
+      "tokens": 2590
+    }
+  },
+  "paper_latex.pdf": {
+    "ours": {
+      "word_recall": 0.999,
+      "word_precision": 0.979,
+      "order": 1.0,
+      "headings": "8/8",
+      "tables": "1/1",
+      "list_items": "6/6",
+      "tokens": 1899
+    },
+    "markitdown": {
+      "word_recall": 0.929,
+      "word_precision": 0.774,
+      "order": 0.516,
+      "headings": "0/8",
+      "tables": "0/1",
+      "list_items": "2/6",
+      "tokens": 1990
+    }
+  },
+  "budget.xlsx": {
+    "ours": {
+      "word_recall": 1.0,
+      "word_precision": 1.0,
+      "order": 1.0,
+      "headings": "2/2",
+      "tables": "3/3",
+      "list_items": "0/0",
+      "tokens": 82
+    },
+    "markitdown": {
+      "word_recall": 1.0,
+      "word_precision": 0.792,
+      "order": 1.0,
+      "headings": "2/2",
+      "tables": "3/3",
+      "list_items": "0/0",
+      "tokens": 90
+    }
+  },
+  "deck.pptx": {
+    "ours": {
+      "word_recall": 1.0,
+      "word_precision": 1.0,
+      "order": 1.0,
+      "headings": "0/0",
+      "tables": "1/1",
+      "list_items": "3/3",
+      "tokens": 100
+    },
+    "markitdown": {
+      "word_recall": 1.0,
+      "word_precision": 0.8,
+      "order": 1.0,
+      "headings": "0/0",
+      "tables": "1/1",
+      "list_items": "0/3",
+      "tokens": 127
+    }
+  },
+  "scanned.pdf": {
+    "ours": {
+      "word_recall": 0.991,
+      "word_precision": 0.978,
+      "order": 1.0,
+      "headings": "0/0",
+      "tables": "0/0",
+      "list_items": "0/0",
+      "tokens": 365
+    },
+    "markitdown": {
+      "word_recall": 0.0,
+      "word_precision": 0.0,
+      "order": 0.0,
+      "headings": "0/0",
+      "tables": "0/0",
+      "list_items": "0/0",
+      "tokens": 1
+    }
+  }
+}

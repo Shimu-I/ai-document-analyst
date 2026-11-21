@@ -1,0 +1,51 @@
+flowchart LR
+  subgraph IN["1. Inputs"]
+    I1["Documents<br/>PDF · DOCX · XLSX<br/>PPTX · CSV"]
+    I2["Images<br/>PNG · JPG · WEBP<br/>TIFF · BMP · GIF"]
+    I3["Data and web<br/>JSON · YAML · TOML<br/>XML · HTML · ipynb · code"]
+    I4["Old Office files<br/>doc · xls · ppt<br/>odt · rtf"]
+  end
+
+  subgraph CV["2. src/convert"]
+    D{{"convert()<br/>picks a converter<br/>by file extension"}}
+    C1["pdf.py<br/>pdfplumber + OCR"]
+    C2["office.py<br/>DOCX · XLSX · PPTX · CSV"]
+    C3["image.py<br/>Tesseract OCR"]
+    C4["structured.py<br/>data, HTML, notebooks, code"]
+    C5["LibreOffice<br/>old to modern format"]
+    K["compact.py<br/>optional compact mode"]
+  end
+
+  M[("3. ConvertedDocument<br/>markdown<br/>stats<br/>warnings")]
+
+  subgraph AN["4. src/analyze"]
+    N1["classify.py<br/>what kind of<br/>document?"]
+    N2["summarize.py<br/>summary · outline<br/>key points"]
+  end
+
+  S["5. src/service.py<br/>process()<br/>output_files()<br/>zip_results()"]
+
+  subgraph FE["6. Front ends"]
+    F1["Web page<br/>Streamlit"]
+    F2["HTTP API<br/>FastAPI"]
+    F3["Command line<br/>src.cli"]
+  end
+
+  OUT["7. Result<br/>.md file or .zip of parts<br/>type · summary<br/>token estimate · warnings"]
+
+  I1 --> D
+  I2 --> D
+  I3 --> D
+  I4 --> D
+  D --> C1 & C2 & C3 & C4 & C5
+  C1 & C2 & C3 & C4 & C5 --> K
+  K --> M --> N1 --> N2 --> S
+  S --> F1 & F2 & F3
+  F1 & F2 & F3 --> OUT
+
+  classDef input fill:#f1f3f6,stroke:#9aa6b8,color:#1b2430
+  classDef core fill:#e8f0fe,stroke:#3b6fd4,color:#1b2430
+  classDef out fill:#e6f4ea,stroke:#2e8b57,color:#1b2430
+  class I1,I2,I3,I4 input
+  class D,C1,C2,C3,C4,C5,K,N1,N2,S,F1,F2,F3 core
+  class M,OUT out

@@ -1,0 +1,23 @@
+# Conversion works with no settings. For the optional free AI summary, run Ollama on the host and set:
+#   LLM_MODEL=<name from `ollama list`>
+# (LLM_BASE_URL defaults to the host's Ollama; on Linux the extra_hosts line makes that reachable.)
+x-env: &env
+  - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+  - ANTHROPIC_MODEL=${ANTHROPIC_MODEL:-claude-sonnet-5-5}
+  - LLM_PROVIDER=${LLM_PROVIDER:-}
+  - LLM_MODEL=${LLM_MODEL:-}
+  - LLM_BASE_URL=${LLM_BASE_URL:-http://host.docker.internal:11434/v1}
+  - LLM_API_KEY=${LLM_API_KEY:-}
+
+services:
+  api:
+    build: .
+    ports: ["8000:8000"]
+    environment: *env
+    extra_hosts: ["host.docker.internal:host-gateway"]
+  ui:
+    build: .
+    command: ["streamlit", "run", "app/streamlit_app.py", "--server.address", "0.0.0.0", "--server.port", "8501"]
+    ports: ["8501:8501"]
+    environment: *env
+    extra_hosts: ["host.docker.internal:host-gateway"]

@@ -1,0 +1,16 @@
+flowchart LR
+  A["Original file<br/>layout, repeated headers,<br/>punctuation, repeated keys,<br/>padding, comments"] --> B["1. Convert<br/>keep only the content<br/>and its structure"]
+  B --> C["2. Compact (optional)<br/>no table padding,<br/>no empty values,<br/>no extra blank lines"]
+  C --> D{"3. Longer than the<br/>chat window?"}
+  D -- "no" --> E["One .md file"]
+  D -- "yes" --> F["Split by token budget<br/>break before headings,<br/>repeat table headers"]
+  F --> G["part 1 of n<br/>part 2 of n<br/>..."]
+  E --> H["Paste the .md into an AI chat<br/>instead of the original file"]
+  G --> H
+
+  classDef step fill:#e8f0fe,stroke:#3b6fd4,color:#1b2430
+  classDef ok fill:#e6f4ea,stroke:#2e8b57,color:#1b2430
+  classDef raw fill:#fff4e0,stroke:#d98e04,color:#1b2430
+  class B,C,F step
+  class E,G,H ok
+  class A raw
