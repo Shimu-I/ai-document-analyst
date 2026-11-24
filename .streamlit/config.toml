@@ -1,0 +1,16 @@
+# Warm light theme built from five colours:
+#   Concrete #525871 · Warm Steel #857C91 · Rosewood #CD9FA0 · Peaches & Cream #F2C1A3 · Dawn #F8CCAA
+# Text size and the page look are set in app/ui.py (CSS).
+[theme]
+base = "light"
+primaryColor = "#525871"
+backgroundColor = "#F1E3D6"
+secondaryBackgroundColor = "#E8D4C2"
+textColor = "#3E4358"
+font = "sans serif"
+
+[client]
+toolbarMode = "minimal"
+
+[browser]
+gatherUsageStats = false
