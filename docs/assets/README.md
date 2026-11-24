@@ -9,3 +9,8 @@
 
 `terminal.png` shows real output of the command line. No screenshot of the Streamlit page exists yet: it should be added after the first local run
 (`streamlit run app/streamlit_app.py`, convert a sample, capture the page).
+
+
+## Diagram pictures for the web app
+
+`scripts/make_diagrams.py` renders every Mermaid block in `docs/` to `docs/assets/diagrams/<document>_<n>.png` (needs `mmdc`). The Docs page of the web app shows these pictures, because Streamlit cannot draw Mermaid. Run the script again after editing a diagram and commit the new PNGs.

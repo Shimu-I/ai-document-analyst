@@ -1,4 +1,4 @@
-# 10 - Corner cases and troubleshooting
+# Corner cases and troubleshooting
 
 Part 1 lists awkward inputs and exactly what the tool does with each. All 49 are executed by one script, so the table cannot silently drift from the code:
 
@@ -76,7 +76,7 @@ Last run (November 2026, Linux, Python 3.13, Tesseract and LibreOffice present):
 | Several YAML documents with the same keys | Treated as a list of records: one table |
 | Notebook cell output longer than 40 lines | First 40 lines kept, then `... (N more lines)` |
 | HTML that only builds its content with JavaScript | Warning `no readable text` |
-| `.gsheet`, `.gdoc`, `.gslides`, `.gdraw`, `.gform` | Error explaining the export route (see chapter 06, section 6) |
+| `.gsheet`, `.gdoc`, `.gslides`, `.gdraw`, `.gform` | Error explaining the export route (see the user manual (deep dive) page, section 6) |
 | Code that contains triple backticks | Four backticks are used for the fence |
 
 ### Images
@@ -110,10 +110,10 @@ Last run (November 2026, Linux, Python 3.13, Tesseract and LibreOffice present):
 | Word headers, footers, footnotes, text boxes are not included | Not read by the converter (warned) | Copy them manually if needed |
 | Formulas in Excel appear as values | Markdown has no formulas | Keep the `.xlsx` for calculations |
 | JSON is not reproduced byte for byte | Readable rendering trades exactness for tokens | `--json minified` for exact JSON |
-| Only nine document types are recognised | Rule-based classifier | Extend the cue dictionary (chapter 05, phase 8) |
+| Only nine document types are recognised | Rule-based classifier | Extend the cue dictionary (the build from scratch page, phase 8) |
 | Right-to-left text in PDFs, password-protected Office files, very large files (hundreds of MB) | Not tested | Test with a real sample first; expect clear errors, not silent success |
 | Token numbers are estimates | A real tokenizer is model-specific | Use the target model's own counter for exact numbers |
-| The web page and the API have no login | Kept simple | Do not expose them publicly (chapter 09) |
+| The web page and the API have no login | Kept simple | Do not expose them publicly (the free deployment page) |
 
 ## 3. Troubleshooting
 

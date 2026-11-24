@@ -1,7 +1,7 @@
-# 06 - User manual
+# User manual
 
 How to use the tool day to day: install, convert files, pick options, understand the result, save tokens.
-Installation details are in [07](07_free_setup.md); free hosting is in [09](09_deployment_free.md).
+Installation details are in [free AI summary setup](free_ai_summary_setup.md); free hosting is in [free deployment](deployment_free.md).
 
 ## 1. Install in five minutes
 
@@ -27,8 +27,10 @@ All three use the same code (`src/service.py`) and give the same results.
 
 ### 2.1 Web page
 
-1. Open the page, choose one or more files (drag and drop works).
-2. Set the options in the left sidebar (section 4). **Compact mode is switched on by default in the web page** (it is off by default in the command line and the API).
+Pages: **Home** (introduction and buttons), **Convert**, **Dashboard** (history of conversions) and **Guide**; details in [web app and images](web_app_and_images.md).
+
+1. Open the Convert page, choose one or more files (drag and drop works).
+2. Set the options on the page (section 4). *Keep figures, diagrams and equations as images* is on by default. **Compact mode is switched on by default in the web page** (it is off by default in the command line and the API).
 3. Click **Convert**.
 4. For each file: read *What this is* and the summary, check the warnings, then **Download .md**.
 5. For several files or split parts, a **.zip** download appears.
@@ -62,6 +64,7 @@ python -m src.cli report.pdf --summary             # add a short summary block a
 | `--ocr` | Force OCR for every PDF page, even when a text layer exists |
 | `--page-markers` | Insert `<!-- page N -->` before each PDF page (removed again by `--compact`) |
 | `--keep-headers` | Keep repeated headers and footers in PDFs |
+| `--images` | Save figures, diagrams and equations as images in an `assets/` folder ([web app and images](web_app_and_images.md)) |
 | `--llm` | Use the configured AI model for the summary (section 7) |
 
 **Exit codes:** `0` all files converted; `1` at least one failed (the others are still written); `2` nothing to convert.
@@ -81,7 +84,7 @@ curl http://localhost:8000/health
 ```
 
 Form fields: `compact`, `json_mode` (`readable` or `minified`), `ocr_lang`, `max_tokens`, `page_markers`, `keep_headers`, `force_ocr`, `use_llm`,
-and, for `/convert/download`, `include_summary`. Errors are JSON `{"detail": "..."}` with status 400 (empty), 413 (too large), 415 (unsupported), 422 (could not convert).
+`images`, and, for `/convert/download`, `include_summary`. Errors are JSON `{"detail": "..."}` with status 400 (empty), 413 (too large), 415 (unsupported), 422 (could not convert).
 The API has **no authentication and no rate limit**; use it only on a trusted network.
 
 ## 3. What each format produces
@@ -181,4 +184,4 @@ step ever leaves the computer, and only with a hosted provider configured.
 | Minimum `--max-tokens` | 200 |
 | Nested data depth rendered line by line | 12 levels |
 
-More edge cases: [chapter 10](10_corner_cases_and_troubleshooting.md).
+More edge cases: [corner cases](corner_cases.md).

@@ -1,4 +1,4 @@
-# 02 - Conversion notes and known limits
+# Conversion notes and known limits
 
 Warnings listed here are shown to the user in the app, CLI and API (`warnings`).
 
@@ -48,7 +48,7 @@ delimiter and encoding detection (rows above 5,000 are cut with a warning). TXT/
 JSON, JSONL, YAML, TOML and XML: lists of similar records become one table, everything else becomes `key: value` lines
 (XML with entity declarations is refused). Notebooks keep Markdown cells, code and text outputs (first 40 lines each).
 HTML keeps the main content only. Source code becomes a fenced block. Google shortcut files (`.gsheet`, `.gdoc`, `.gslides`)
-give an error with export instructions. Full behaviour per case: [chapter 10](10_corner_cases_and_troubleshooting.md).
+give an error with export instructions. Full behaviour per case: [corner cases](corner_cases.md).
 
 ## Old formats
 

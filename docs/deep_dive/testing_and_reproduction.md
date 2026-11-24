@@ -1,20 +1,20 @@
-# 08 - Testing every feature and reproducing the results
+# Testing every feature and reproducing the results
 
-All commands run from the project folder with the virtual environment active (`source .venv/bin/activate`). Setup is in [chapter 06](06_user_manual.md#1-install-in-five-minutes).
+All commands run from the project folder with the virtual environment active (`source .venv/bin/activate`). Setup is in [user manual (deep dive)](user_manual.md#1-install-in-five-minutes).
 
 ## 1. Automated tests
 
 ```bash
-python3 -m unittest discover -s tests -t .          # expect: Ran 89 tests ... OK (skipped=1)
-python3 -m pytest -q                                # same tests; expect: 89 passed, 1 skipped
+python3 -m unittest discover -s tests -t .          # expect: Ran 131 tests ... OK (skipped=1)
+python3 -m pytest -q                                # same tests; expect: 131 passed, 1 skipped
 python3 -m unittest tests.test_formats_and_tokens   # only images, data formats, compact, split, tokens
 python3 scripts/corner_cases.py                     # 49 awkward inputs; expect: 49 passed
 ```
 
-- 89 tests. The skipped test is the API test module when FastAPI is not installed.
+- 131 tests. The skipped test is the API test module when FastAPI is not installed.
 - Image tests need the `tesseract` program and skip themselves when it is missing.
 - Coverage by file: `test_convert_pdf.py` (PDF layout, columns, headers, OCR), `test_convert_office.py` (DOCX/XLSX/PPTX/CSV), `test_formats_and_tokens.py` (images, structured data, HTML, Google shortcuts, compact, splitting, token estimate, service, CLI), `test_analyze.py` (type detection, summaries), `test_llm_clients.py`, `test_service_cli.py`.
-- `scripts/corner_cases.py` is described in [chapter 10](10_corner_cases_and_troubleshooting.md).
+- `scripts/corner_cases.py` is described in [corner cases](corner_cases.md).
 
 ## 2. Try each feature by hand
 
@@ -72,7 +72,7 @@ pip install matplotlib                  # only for the two measured charts
 python3 scripts/make_figures.py         # docs/assets/tokens_json.png and fidelity.png
 ```
 
-The diagrams are described in [docs/assets/README.md](assets/README.md).
+The diagrams are described in [docs/assets/README.md](../assets/README.md).
 
 ## 6. Known issues found while testing
 

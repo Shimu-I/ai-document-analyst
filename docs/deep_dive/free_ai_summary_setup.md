@@ -1,4 +1,4 @@
-# 07 - Running the project for free
+# Running the project for free
 
 Nothing in this project needs a paid service.
 
@@ -9,7 +9,7 @@ Nothing in this project needs a paid service.
 | AI summary with a hosted provider's free tier | $0 within the provider's limits | yes | **yes** |
 
 The AI summary is only needed for a rewritten summary and key points. The converter and the built-in extractive summary work without it.
-Free hosting of the web page itself is covered in [chapter 09](09_deployment_free.md).
+Free hosting of the web page itself is covered in [free deployment](deployment_free.md).
 
 ## 1. Local model with Ollama
 

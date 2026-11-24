@@ -1,23 +1,23 @@
-# 11 - FAQ and interview questions
+# FAQ and interview questions
 
 Part 1 answers practical questions about the tool. Part 2 collects questions likely to come up when the project is presented (interview, viva, portfolio review), with answers grounded in what the code and the measurements actually show.
 
 ## Part 1 - FAQ
 
 **What is this project?**
-A local tool that converts PDF, Word, Excel, PowerPoint, CSV, images, JSON-like data, HTML and code into clean Markdown, says what kind of document it is, and writes a short summary. The Markdown is meant to be pasted into an AI chat instead of the original file. See [chapter 04](04_concepts_and_architecture.md).
+A local tool that converts PDF, Word, Excel, PowerPoint, CSV, images, JSON-like data, HTML and code into clean Markdown, says what kind of document it is, and writes a short summary. The Markdown is meant to be pasted into an AI chat instead of the original file. See [concepts and architecture](concepts_and_architecture.md).
 
 **Why not just ask a chatbot to convert the file?**
 Three reasons. (1) The chatbot spends output tokens re-typing the whole document. (2) A local converter is deterministic: the same file gives the same result. (3) The file never leaves the computer during conversion. The cost of the alternative was not measured against any specific chatbot, so no percentage is claimed for that comparison.
 
 **Does anything leave the computer?**
-Conversion: no. Only the optional AI summary sends text to a model, and only when a hosted provider is configured. With local Ollama nothing leaves the machine. A hosted deployment (chapter 09) uploads files to that host.
+Conversion: no. Only the optional AI summary sends text to a model, and only when a hosted provider is configured. With local Ollama nothing leaves the machine. A hosted deployment (the free deployment page) uploads files to that host.
 
 **Does it cost anything?**
 No. Every dependency is open source. The optional AI summary can use free local models.
 
 **How accurate is the conversion?**
-Measured on three synthetic PDFs, reading order was 100% for this tool against 52% to 93% for the comparison tool (markitdown); see [chapter 03](03_evaluation.md). Those samples were built during development and the rules were tuned on them, so real-world accuracy will be lower. The honest statement: good on clean digital documents, variable on messy ones, and every known loss is reported as a warning.
+Measured on three synthetic PDFs, reading order was 100% for this tool against 52% to 93% for the comparison tool (markitdown); see [evaluation details](evaluation_details.md). Those samples were built during development and the rules were tuned on them, so real-world accuracy will be lower. The honest statement: good on clean digital documents, variable on messy ones, and every known loss is reported as a warning.
 
 **How accurate is OCR?**
 It depends on image quality. The tool reports the mean Tesseract confidence and names doubtful words. Names, amounts and dates should always be checked against the picture.
@@ -26,10 +26,10 @@ It depends on image quality. The tool reports the mean Tesseract confidence and 
 By an estimate: ASCII characters divided by 4 plus other characters divided by 1.5. Real tokenizers differ by model. The estimate is good for deciding whether a split is needed, not for billing.
 
 **Which token savings are real?**
-Measured on one generated 40-record JSON file: indented JSON 2,600 estimated tokens, minified 1,412, readable 822, readable plus compact 716. Against minified JSON (the fairer baseline) that is about 42% and 49% fewer. The result depends heavily on the data; records with long text values save much less.
+Measured on one generated 40-record JSON file: indented JSON 2,600 estimated tokens, minified 1,416, readable 822, readable plus compact 716. Against minified JSON (the fairer baseline) that is about 42% and 49% fewer. The result depends heavily on the data; records with long text values save much less.
 
 **Why is a Google Sheet not readable?**
-`.gsheet` files saved by Google Drive for desktop are shortcuts containing only a link. The content lives on Google's servers. Export to `.xlsx` or `.csv` first ([chapter 06, section 6](06_user_manual.md#6-google-sheets-docs-and-slides)).
+`.gsheet` files saved by Google Drive for desktop are shortcuts containing only a link. The content lives on Google's servers. Export to `.xlsx` or `.csv` first ([user manual (deep dive), section 6](user_manual.md#6-google-sheets-docs-and-slides)).
 
 **Can pictures and charts be described?**
 No. The tool extracts text. A chart or photo should be sent to the chat as an image. The tool prints the estimated cost of sending the image so the two options can be compared.
@@ -41,7 +41,7 @@ The code is plain Python and should work, but it was only run on Linux. Tesserac
 JSON, YAML, XML, TOML, plain text and source code are already text, so a folder scan skips them. Naming such a file explicitly converts it.
 
 **Where are the tests, and how are they run?**
-`pytest -q` runs the unit tests (89 pass, 1 skipped when a tool is missing). `python scripts/corner_cases.py` runs 49 awkward inputs. `python scripts/evaluate_fidelity.py` compares against markitdown. See [chapter 08](08_testing_and_reproduction.md).
+`pytest -q` runs the unit tests (131 pass, 1 skipped when FastAPI is missing). `python scripts/corner_cases.py` runs 49 awkward inputs. `python scripts/evaluate_fidelity.py` compares against markitdown. See [testing and reproduction](testing_and_reproduction.md).
 
 ## Part 2 - Interview and presentation questions
 
@@ -85,7 +85,7 @@ It is free, local and supports many languages. Its weakness (layout and low-qual
 ### Evaluation and honesty
 
 **How was the tool evaluated?**
-Fidelity script on three synthetic PDFs and one DOCX against markitdown (word recall, reading order, heading and table detection), a corner-case script with 49 cases, and 89 unit tests. Token savings were measured on one generated JSON file.
+Fidelity script on three synthetic PDFs and one DOCX against markitdown (word recall, reading order, heading and table detection), a corner-case script with 49 cases, and 131 unit tests. Token savings were measured on one generated JSON file.
 
 **What are the weaknesses of that evaluation?**
 Samples are synthetic and the rules were tuned on them. There is no real-world corpus, no measurement of savings against real chatbot readers, and no user study. These are stated in the documentation rather than hidden.
@@ -105,7 +105,7 @@ Real UI screenshots and a hosted demo; a corpus of real, permission-cleared docu
 Take a set of real documents, convert them, and compare token counts using the target model's own tokenizer against the raw text extraction and against the image input, reporting the spread rather than a single number.
 
 **What are the security risks?**
-Untrusted files are parsed: XML entity declarations are refused, upload size is capped, nothing is executed. The API and page have no authentication, so a public deployment needs a password or proxy in front (chapter 09).
+Untrusted files are parsed: XML entity declarations are refused, upload size is capped, nothing is executed. The API and page have no authentication, so a public deployment needs a password or proxy in front (the free deployment page).
 
 **What would be done differently from scratch?**
 Collect real sample documents first and build the evaluation set before tuning rules, to avoid fitting the rules to the samples.

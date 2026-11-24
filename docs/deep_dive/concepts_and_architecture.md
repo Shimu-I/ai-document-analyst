@@ -1,8 +1,8 @@
-# 04 - Concepts and architecture
+# Concepts and architecture
 
 This chapter explains what the project is, which problem it addresses, and how the pieces fit together.
-Later chapters build on it: [05](05_build_from_scratch.md) rebuilds the project step by step,
-[06](06_user_manual.md) explains day-to-day use.
+Later chapters build on it: [build from scratch](build_from_scratch.md) rebuilds the project step by step,
+[user manual (deep dive)](user_manual.md) explains day-to-day use.
 
 ## 1. What this project is
 
@@ -59,7 +59,7 @@ original file, or kept as a plain-text archive.
 
 ## 4. Architecture
 
-![Architecture](assets/01_architecture.png)
+![Architecture](../assets/01_architecture.png)
 
 *Figure 1. Files flow left to right: inputs, converters, the shared `ConvertedDocument`, analysis, the service layer, the three front ends.*
 
@@ -110,7 +110,7 @@ Every converter returns the same dataclass, which is why the rest of the system 
 
 ## 5. One request, step by step
 
-![Request flow](assets/02_request_flow.png)
+![Request flow](../assets/02_request_flow.png)
 
 *Figure 2. What happens between an upload and a download.*
 
@@ -125,9 +125,9 @@ extension -> 415; corrupt, encrypted or invalid file -> 422 with a specific mess
 ### PDF: rebuilding structure from positions
 
 A PDF stores *where each glyph is drawn*, not paragraphs. The converter reconstructs structure from geometry
-([details in chapter 05, phase 4](05_build_from_scratch.md#phase-4--pdf-the-hardest-converter)):
+([details in the build from scratch page, phase 4](build_from_scratch.md#phase-4--pdf-the-hardest-converter)):
 
-![PDF pipeline](assets/03_pdf_pipeline.png)
+![PDF pipeline](../assets/03_pdf_pipeline.png)
 
 *Figure 3. PDF pipeline.*
 
@@ -139,7 +139,7 @@ A PDF stores *where each glyph is drawn*, not paragraphs. The converter reconstr
 
 ### Images: OCR with preparation and layout rebuilding
 
-![Image OCR pipeline](assets/04_image_ocr.png)
+![Image OCR pipeline](../assets/04_image_ocr.png)
 
 *Figure 4. Image pipeline.*
 
@@ -150,7 +150,7 @@ reported so that names and numbers can be checked against the picture.
 
 ### Data files: stop paying for punctuation
 
-![Structured data rendering](assets/05_structured_data.png)
+![Structured data rendering](../assets/05_structured_data.png)
 
 *Figure 5. Rendering rules for JSON-like data.*
 
@@ -167,7 +167,7 @@ removes whitespace.
 
 ## 7. Token-saving tools
 
-![Token saving](assets/06_token_saving.png)
+![Token saving](../assets/06_token_saving.png)
 
 *Figure 6. Convert, compact, split.*
 
@@ -177,10 +177,10 @@ removes whitespace.
 | `--compact` | Removes table padding and alignment rows, HTML comments, repeated spaces, extra blank lines, and (data files) empty values | Empty JSON values disappear (reported with a character count) |
 | `--max-tokens N` | Splits into parts of about N tokens, breaking before headings and repeating table headers | Parts are slightly smaller than N, because breaks prefer headings |
 
-Measured on a generated 40-record JSON file (estimated tokens): indented JSON 2,600, minified JSON 1,412, readable
+Measured on a generated 40-record JSON file (estimated tokens): indented JSON 2,600, minified JSON 1,416, readable
 822, readable + compact 716.
 
-![Token chart](assets/tokens_json.png)
+![Token chart](../assets/tokens_json.png)
 
 *Figure 7. The comparison against indented JSON flatters the tool; minified JSON is the fairer baseline (-42% for readable and -49% for readable + compact, measured against it).*
 
@@ -195,7 +195,7 @@ shown next to OCR results so that the text version and the image version can be 
 
 ## 9. Understanding the result
 
-![Analysis flow](assets/07_analysis.png)
+![Analysis flow](../assets/07_analysis.png)
 
 *Figure 8. Classification and summary.*
 

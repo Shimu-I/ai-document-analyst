@@ -1,10 +1,10 @@
-# 03 - Evaluation
+# Evaluation
 
 Script: `python scripts/evaluate_fidelity.py` → prints a table and writes `reports/fidelity.json`.
-Tests: `python -m unittest discover -s tests -t .` (89 tests, 1 skipped). The API test class is skipped when FastAPI
+Tests: `python -m unittest discover -s tests -t .` (131 tests, 1 skipped). The API test class is skipped when FastAPI
 and httpx are not installed, which was the case in the environment where this was built, so the API
 endpoints themselves have not been exercised; running the tests after `pip install -r requirements.txt`
-includes them. Awkward inputs are covered separately by `python scripts/corner_cases.py` (49 cases, see [chapter 10](10_corner_cases_and_troubleshooting.md)).
+includes them. Awkward inputs are covered separately by `python scripts/corner_cases.py` (49 cases, see [corner cases](corner_cases.md)).
 
 ## What is measured
 

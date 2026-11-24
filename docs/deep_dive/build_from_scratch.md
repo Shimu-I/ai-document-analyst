@@ -1,10 +1,10 @@
-# 05 - Build it from scratch, start to finish
+# Build it from scratch, start to finish
 
 This is a learning path, not a download. Each phase explains the *idea* first, then the steps, then a way to *check*
 that the step works, then a commit. The repository holds a finished version of every file for comparison, but the
 learning comes from typing each piece, running it and breaking it on purpose.
 
-![Roadmap](assets/09_build_roadmap.png)
+![Roadmap](../assets/09_build_roadmap.png)
 
 *Roadmap: 15 phases, each ending in a commit.*
 
@@ -266,7 +266,7 @@ blockquote. Group shapes are walked recursively; pictures are counted and report
 **Idea.** A PDF is a list of glyphs placed at coordinates. Nothing in it says "paragraph" or "heading". Everything must be
 *inferred from geometry*: position, font size, font name. Build it in layers; each layer has its own Check.
 
-![PDF pipeline](assets/03_pdf_pipeline.png)
+![PDF pipeline](../assets/03_pdf_pipeline.png)
 
 ### 4a. Read words with their fonts
 
@@ -385,7 +385,7 @@ together). Disable the gutter test on the two-column sample and read the output 
 
 **Goal:** `convert_image` in `src/convert/image.py`, and the OCR fallback used by the PDF converter.
 
-![Image OCR pipeline](assets/04_image_ocr.png)
+![Image OCR pipeline](../assets/04_image_ocr.png)
 
 **Idea.** `pytesseract.image_to_string(img)` alone fails on real pictures. Three preparation problems appear immediately:
 
@@ -432,7 +432,7 @@ the image may be a photo, chart or diagram and that the image itself should be s
 
 **Goal:** `src/convert/structured.py` for JSON, JSONL, YAML, TOML, XML, notebooks, HTML, source code, and the Google-file message.
 
-![Structured data rendering](assets/05_structured_data.png)
+![Structured data rendering](../assets/05_structured_data.png)
 
 **Idea.** JSON spends tokens on punctuation and repeated keys. A list of similar records fits a table where each key is written
 once. Everything parses into Python objects first (`json.loads`, `yaml.safe_load_all`, `tomllib.loads`, `xml.etree`), then one
@@ -475,7 +475,7 @@ an XML file with an entity.
 
 **Goal:** `src/convert/compact.py`.
 
-![Token saving](assets/06_token_saving.png)
+![Token saving](../assets/06_token_saving.png)
 
 ### Compact mode
 
@@ -507,7 +507,7 @@ Goal: parts of about N tokens that can be pasted one after another.
 
 **Goal:** `src/analyze/classify.py` and `summarize.py`.
 
-![Analysis flow](assets/07_analysis.png)
+![Analysis flow](../assets/07_analysis.png)
 
 ### Classifier (no machine learning)
 
@@ -612,7 +612,7 @@ file, tables, time or OCR confidence), the summary, warnings, a download button,
 tables, list items). LibreOffice renders DOCX to PDF and recalculates the spreadsheet, so the samples are realistic files from a real office suite. Synthetic text
 means exact ground truth and no privacy problems. The cost: results measured on them say little about arbitrary real documents.
 
-### Unit tests (`unittest`, 89 tests)
+### Unit tests (`unittest`, 131 tests)
 
 Cover each converter, the analysis, the AI clients (with stub servers, no network), the service and the CLI. Image tests skip themselves when Tesseract is missing,
 API tests when FastAPI is missing. Rule: **every bug found by hand becomes a test first**, then a fix.
@@ -631,7 +631,7 @@ The script also runs Microsoft's `markitdown` on the same files as a reference p
 ### Corner-case runner (`scripts/corner_cases.py`)
 
 49 awkward inputs (empty file, wrong extension, password-protected PDF, hidden Excel sheet, entity-bomb XML, 25-frame GIF...) run through the same code path as the
-web page; the script prints what happened and exits non-zero if behaviour deviates. See [chapter 10](10_corner_cases_and_troubleshooting.md).
+web page; the script prints what happened and exits non-zero if behaviour deviates. See [corner cases](corner_cases.md).
 
 **Commit:** `test: unit tests, synthetic samples with ground truth, fidelity and corner-case scripts`
 
@@ -641,7 +641,7 @@ web page; the script prints what happened and exits non-zero if behaviour deviat
 `uvicorn api.main:app`. **docker-compose.yml** defines two services from the same image: `api` (port 8000) and `ui` (port 8501, command `streamlit run ...`).
 Environment variables (`LLM_MODEL`, `LLM_BASE_URL`, ...) are passed through with defaults.
 
-Free hosting options and their limits are in [chapter 09](09_deployment_free.md). For Streamlit Community Cloud, `packages.txt` (one apt package per line) installs Tesseract.
+Free hosting options and their limits are in [free deployment](deployment_free.md). For Streamlit Community Cloud, `packages.txt` (one apt package per line) installs Tesseract.
 
 **Check:** `docker compose up --build`, then open ports 8000 and 8501. (Docker could not be run where the repository was prepared: this phase is untested there.)
 
@@ -652,7 +652,7 @@ Free hosting options and their limits are in [chapter 09](09_deployment_free.md)
 ### Documentation habits that pay off
 
 - Write the README *after* the tool works, using real output and real numbers; every number needs a script that reproduces it.
-- State limitations plainly (see the Limitations section of the README and chapter 10). Reviewers trust a project that names its weaknesses.
+- State limitations plainly (see the Limitations section of the README and the corner cases page). Reviewers trust a project that names its weaknesses.
 - Keep one source of truth: the README tells the story; the portfolio page is a shortened copy of it.
 
 ### Push to GitHub
@@ -681,8 +681,8 @@ One idea per commit; the message states *what* and the body *why*.
 - [ ] `python3 -m unittest discover -s tests -t .` passes
 - [ ] `python scripts/corner_cases.py` reports no FAIL
 - [ ] `python scripts/evaluate_fidelity.py` reproduces the numbers quoted in the README
-- [ ] Each format in [chapter 06](06_user_manual.md) converts through the web page, the API and the CLI
-- [ ] The Streamlit page and the API were started at least once and the first-run checklist in chapter 08 completed
+- [ ] Each format in [user manual (deep dive)](user_manual.md) converts through the web page, the API and the CLI
+- [ ] The Streamlit page and the API were started at least once and the first-run checklist in the testing and reproduction page completed
 - [ ] README placeholders replaced (username, name, screenshots), all links checked
 - [ ] No private document in the repository; samples are synthetic
 

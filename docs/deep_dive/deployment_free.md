@@ -1,10 +1,10 @@
-# 09 - Deployment with free resources
+# Deployment with free resources
 
 > **Status of this chapter.** Nothing here was deployed from the environment where the project was built. The steps follow the
 > hosting providers' public documentation (checked in November 2026) and the project's own files. Free tiers change often, so
 > each section says what to verify. Treat every deployment as an experiment until the checklist in section 9 passes.
 
-![Deployment options](assets/08_deployment.png)
+![Deployment options](../assets/08_deployment.png)
 
 *Figure 1. Choosing where to run the tool.*
 
@@ -29,7 +29,7 @@
 
 ### Virtual environment
 
-Follow [chapter 06, section 1](06_user_manual.md#1-install-in-five-minutes), then `streamlit run app/streamlit_app.py`.
+Follow [user manual (deep dive), section 1](user_manual.md#1-install-in-five-minutes), then `streamlit run app/streamlit_app.py`.
 
 ### Docker (optional)
 
