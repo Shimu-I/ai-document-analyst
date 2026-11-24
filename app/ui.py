@@ -9,7 +9,8 @@ CSS = """
 <style>
 /* palette: Concrete #525871 · Warm Steel #857C91 · Rosewood #CD9FA0 · Peaches & Cream #F2C1A3 · Dawn #F8CCAA */
 :root { --concrete:#525871; --steel:#857C91; --rose:#CD9FA0; --peach:#F2C1A3; --dawn:#F8CCAA;
-        --ink:#3E4358; --muted:#6E667B; --line:rgba(82,88,113,.16); --card:#F8EBDF; --bg:#F1E3D6; --drop:#F4E5D7; }
+        --ink:#3E4358; --muted:#6E667B; --line:rgba(82,88,113,.16); --card:#F8EBDF; --bg:#F1E3D6; --drop:#F4E5D7;
+        --solid:#525871; --on-solid:#FBF3EC; --solid-hover:#444A63; --band:#525871; }
 /* no sidebar anywhere: navigation is the top bar */
 [data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"], [data-testid="collapsedControl"] { display:none !important; }
 .block-container, [data-testid="stMainBlockContainer"] { max-width: 1180px !important; width: 100%; margin-left: auto !important; margin-right: auto !important; padding-top: 1.2rem; padding-bottom: 3rem; }
@@ -26,12 +27,12 @@ p, li { line-height: 1.65; }
 [data-testid="stMetricLabel"] p { font-size: .94rem !important; color: var(--muted); }
 [data-testid="stVerticalBlockBorderWrapper"] { border-radius: 12px; border-color: var(--line); background: var(--card); }
 .stButton > button, .stDownloadButton > button { border-radius: 9px; padding: .45rem 1.1rem; font-weight: 550; border-color: var(--line); }
-.stButton > button[kind="primary"], .stDownloadButton > button[kind="primary"] { background: var(--concrete); border-color: var(--concrete); color: #FBF3EC; }
-.stButton > button[kind="primary"]:hover { background: #444A63; border-color:#444A63; color:#fff; }
+.stButton > button[kind="primary"], .stDownloadButton > button[kind="primary"] { background: var(--solid); border-color: var(--solid); color: var(--on-solid); }
+.stButton > button[kind="primary"]:hover { background: var(--solid-hover); border-color: var(--solid-hover); color: var(--on-solid); }
 [data-testid="stFileUploaderDropzone"] { border-radius: 10px; background: var(--drop); border: 1.5px dashed var(--steel); }
 [data-testid="stTabs"] button p { font-size: .98rem; }
 /* top bar */
-.brand { font-size: 1.05rem; font-weight: 650; color: var(--concrete); padding-top: .35rem; }
+.brand { font-size: 1.05rem; font-weight: 650; color: var(--concrete); }
 .brand span { display:inline-block; width:.8rem; height:.8rem; border-radius:3px; margin-right:.5rem;
               background: linear-gradient(135deg, var(--rose), var(--peach)); }
 [data-testid="stPageLink"] a { border-radius: 8px; padding: .35rem .6rem; font-size: 1rem; white-space: nowrap; color: var(--ink); justify-content: center; }
@@ -63,17 +64,22 @@ p, li { line-height: 1.65; }
 .stbadge.warn { background:rgba(224,170,90,.22); } .stbadge.warn::before { background:#D69A3C; }
 .stbadge.bad { background:rgba(200,110,110,.2); } .stbadge.bad::before { background:#C25B5B; }
 .foot { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .94rem; }
-/* top bar: one wrapping row; the last two items (app button, theme switch) sit at the right */
-.st-key-topbar [data-testid="stHorizontalBlock"] { flex-wrap: wrap; gap: .25rem .3rem; align-items: center; }
+/* top bar: one row; items centred on one line; the last two items (app button, theme switch) sit at the right */
+.st-key-topbar, .st-key-topbar * { overflow: visible !important; }
+.st-key-topbar [data-testid="stHorizontalBlock"] { flex-wrap: wrap; gap: .25rem .3rem; align-items: center !important; }
 @media (min-width: 1100px) { .st-key-topbar [data-testid="stHorizontalBlock"] { flex-wrap: nowrap; } }
-.st-key-topbar [data-testid="stColumn"] a { padding: .3rem .55rem !important; white-space: nowrap; }
-.st-key-topbar [data-testid="stColumn"] button { padding: .3rem .6rem; min-height: 0; white-space: nowrap; }
-.st-key-topbar [data-testid="stColumn"] { flex: 0 0 auto !important; width: auto !important; min-width: 0 !important; }
+.st-key-topbar [data-testid="stColumn"] { flex: 0 0 auto !important; width: auto !important; min-width: 0 !important; align-self: center !important; padding: 0 !important; }
+.st-key-topbar [data-testid="stVerticalBlock"], .st-key-topbar [data-testid="stElementContainer"], .st-key-topbar [data-testid="stMarkdownContainer"],
+.st-key-topbar [data-testid="stPageLink"] { margin: 0 !important; gap: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; }
+.st-key-topbar [data-testid="stMarkdownContainer"] p, .st-key-topbar a p { margin: 0 !important; line-height: 1.2 !important; }
+.st-key-topbar .brand, .st-key-topbar .chipwrap { padding: 0; display: flex; align-items: center; min-height: 2.4rem; }
+.st-key-topbar [data-testid="stColumn"] a { display: inline-flex !important; align-items: center; min-height: 2.4rem; padding: 0 .6rem !important; white-space: nowrap; }
+.st-key-topbar [data-testid="stColumn"] button { min-height: 2.4rem; padding: 0 .7rem; white-space: nowrap; }
 .st-key-topbar [data-testid="stColumn"]:nth-last-child(2) { margin-left: auto; }
-.st-key-topbar [data-testid="stColumn"]:nth-last-child(2) a { background: var(--concrete); font-weight: 650; }
-.st-key-topbar [data-testid="stColumn"]:nth-last-child(2) a, .st-key-topbar [data-testid="stColumn"]:nth-last-child(2) a * { color: #FBF3EC !important; }
-.st-key-topbar [data-testid="stColumn"]:nth-last-child(2) a:hover { background: #444A63; }
-.navlink { display: inline-block; padding: .35rem .6rem; border-radius: 8px; color: var(--ink) !important; text-decoration: none !important;
+.st-key-topbar [data-testid="stColumn"]:nth-last-child(2) a { background: var(--solid); font-weight: 650; }
+.st-key-topbar [data-testid="stColumn"]:nth-last-child(2) a, .st-key-topbar [data-testid="stColumn"]:nth-last-child(2) a * { color: var(--on-solid) !important; }
+.st-key-topbar [data-testid="stColumn"]:nth-last-child(2) a:hover { background: var(--solid-hover); }
+.navlink { display: inline-flex; align-items: center; min-height: 2.4rem; padding: 0 .6rem; border-radius: 8px; color: var(--ink) !important; text-decoration: none !important;
            font-size: 1rem; white-space: nowrap; }
 .navlink:hover { background: rgba(82,88,113,.08); }
 /* tablet and phone */
@@ -98,7 +104,8 @@ p, li { line-height: 1.65; }
 DIM_CSS = """
 <style>
 :root { --concrete:#F2C1A3; --steel:#B6ADC2; --ink:#EADFD6; --muted:#B9B0C4; --line:rgba(242,193,163,.20);
-        --card:#363B4F; --bg:#2A2E3E; --drop:#32374A; }
+        --card:#363B4F; --bg:#2A2E3E; --drop:#32374A;
+        --solid:#F2C1A3; --on-solid:#2A2E3E; --solid-hover:#F8CCAA; --band:#3A4056; }
 .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] { background: var(--bg) !important; color: var(--ink); }
 .stApp p, .stApp li, .stApp label, .stApp span, .stApp small, .stApp td, .stApp th,
 [data-testid="stMarkdownContainer"], [data-testid="stWidgetLabel"] p, [data-testid="stCaptionContainer"] { color: var(--ink); }
@@ -107,12 +114,12 @@ h1, h2, h3, h4 { color: #F8CCAA !important; }
   { background: #2F3447 !important; color: var(--ink) !important; border-color: var(--line) !important; }
 [data-testid="stExpander"] details, [data-testid="stTable"], [data-testid="stDataFrame"] { background: var(--card); border-color: var(--line); }
 .stButton > button, .stDownloadButton > button { background: var(--card); color: var(--ink); border-color: var(--line); }
-.stButton > button[kind="primary"], .stDownloadButton > button[kind="primary"] { background: #CD9FA0; border-color:#CD9FA0; color:#2A2E3E; }
-.stButton > button[kind="primary"]:hover { background:#F2C1A3; border-color:#F2C1A3; color:#2A2E3E; }
 .hero { background: linear-gradient(160deg, rgba(205,159,160,.28), rgba(133,124,145,.25)); }
 .hero p, .feat, .stat { color: var(--ink); } .feat b, .stat { color: #F8CCAA; }
 .chip { background: rgba(205,159,160,.22); color: #F3DCD0; }
-.step-no { background: #CD9FA0; color:#2A2E3E; }
+.endcta { background: rgba(205,159,160,.16) !important; }
+.lp-badge, .win .tags span { color: #F8CCAA !important; }
+.step-no { background: var(--solid); color: var(--on-solid); }
 [data-testid="stPageLink"] a { color: var(--ink); } [data-testid="stPageLink"] a:hover { background: rgba(242,193,163,.12); }
 [data-testid="stPageLink"] a[aria-current="page"] { background: rgba(205,159,160,.30); color:#F8CCAA; }
 [data-testid="stTabs"] button p { color: var(--ink); }
@@ -155,7 +162,7 @@ def topbar(current: str) -> None:
     with st.container(key="topbar"):
         c = st.columns(11)
         c[0].markdown('<div class="brand"><span></span>Document Analyst</div>', unsafe_allow_html=True)
-        c[1].markdown('<div style="padding-top:.2rem">' + status_chip() + '</div>', unsafe_allow_html=True)
+        c[1].markdown('<div class="chipwrap">' + status_chip() + '</div>', unsafe_allow_html=True)
         c[2].page_link("views/home.py", label="Home")
         for col, (anchor, label) in zip(c[3:6], [("features", "Features"), ("how", "How it works"), ("about", "About")]):
             col.markdown(f'<a class="navlink" target="_self" href="{pre}#{anchor}">{label}</a>', unsafe_allow_html=True)

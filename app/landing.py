@@ -15,8 +15,8 @@ LANDING_CSS = """
 .lp-hero p.lead { font-size: 1.2rem; line-height: 1.6; color: var(--ink); margin: 0 0 1.6rem; max-width: 33rem; }
 .lp-cta { display: flex; flex-wrap: wrap; gap: .8rem; margin-bottom: 1.1rem; }
 .btn { display: inline-block; padding: .8rem 1.5rem; border-radius: 10px; font-weight: 650; font-size: 1.05rem; }
-.btn.primary { background: var(--concrete); color: #FBF3EC !important; }
-.btn.primary:hover { filter: brightness(1.12); }
+.btn.primary { background: var(--solid); color: var(--on-solid) !important; }
+.btn.primary:hover { filter: brightness(1.08); }
 .btn.ghost { border: 1.5px solid var(--steel); color: var(--concrete) !important; }
 .btn.ghost:hover { background: rgba(133,124,145,.14); }
 .lp-note { font-size: .95rem; color: var(--muted); }
@@ -29,6 +29,7 @@ LANDING_CSS = """
 .win .pane + .pane { border-left: 1px solid var(--line); }
 .win .cap { font-size: .8rem; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; color: var(--steel); margin-bottom: .7rem; }
 .win .slide { background: #FFFDFB; border-radius: 8px; padding: .9rem 1rem; color: #1d1d1d; font-weight: 700; font-size: 1.02rem; line-height: 1.75; border: 1px solid rgba(0,0,0,.06); }
+.stApp .win .slide, .stApp .win .slide small, .stApp .win .slide b { color: #1d1d1d !important; }
 .win .slide small { display: block; font-weight: 700; font-size: 1.02rem; padding-left: 1.4rem; }
 .win pre { margin: 0; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .92rem; line-height: 1.75; color: var(--ink); white-space: pre-wrap; background: none; padding: 0; }
 .win .tags { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .9rem; }
@@ -43,18 +44,18 @@ LANDING_CSS = """
 .fitem { padding: 1.4rem 1.5rem 1.5rem 0; border-bottom: 1px solid var(--line); }
 .fitem + .fitem { }
 .fitem .ic { width: 2.1rem; height: 2.1rem; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 700;
-             color: var(--concrete); background: var(--peach); margin-bottom: .8rem; }
+             color: #3E4358; background: var(--peach); margin-bottom: .8rem; }
 .fitem h3 { font-size: 1.2rem !important; margin: 0 0 .35rem !important; padding: 0 !important; }
 .fitem p { margin: 0; font-size: 1rem; color: var(--ink); opacity: .9; }
 .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; counter-reset: s; }
 .step { position: relative; padding-top: 3.2rem; }
 .step::before { counter-increment: s; content: counter(s); position: absolute; top: 0; left: 0; width: 2.4rem; height: 2.4rem; border-radius: 50%;
-                background: var(--concrete); color: #FBF3EC; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+                background: var(--solid); color: var(--on-solid); display: flex; align-items: center; justify-content: center; font-weight: 700; }
 .step::after { content: ""; position: absolute; top: 1.2rem; left: 3.2rem; right: -1rem; border-top: 2px dashed var(--line); }
 .step:last-child::after { display: none; }
 .step h3 { font-size: 1.2rem !important; margin: 0 0 .3rem !important; padding: 0 !important; }
 .step p { margin: 0; font-size: 1rem; }
-.band { margin-top: 3.2rem; background: var(--concrete); border-radius: 16px; padding: 2.2rem 2rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.band { margin-top: 3.2rem; background: var(--band); border: 1px solid var(--line); border-radius: 16px; padding: 2.2rem 2rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
 .band .n { font-size: 2.4rem; font-weight: 750; color: #F8CCAA; line-height: 1.1; }
 .band .l { font-size: .98rem; color: #EADFD6; margin-top: .3rem; }
 .band-note { font-size: .9rem; color: var(--muted); margin-top: .7rem; }

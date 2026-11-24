@@ -15,5 +15,6 @@ Each update script (`apply_update_vNN.sh`) contains **everything** from the orig
 | v9 | Desktop window (Tkinter) with linked reading of slide and text; English and Bengali OCR (`auto`); slide-by-slide reading for PDF, PowerPoint, Word and images |
 | v10 | Desktop documentation (features, install, user guide, limits, troubleshooting), `scripts/run_desktop.sh` launcher, diagram pictures refreshed |
 | v11 | Top bar: theme switch no longer wraps, readable "Open the app" button; update message corrected |
+| v12 | Top bar items on one line and no longer clipped; Dim mode: readable text on buttons, step circles, stat band and slide picture |
 
 Versions v1 to v6 were delivered as separate files earlier; this list was written afterwards from the project history.
