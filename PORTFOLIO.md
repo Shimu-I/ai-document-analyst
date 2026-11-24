@@ -21,9 +21,9 @@ Converts PDFs, Office files, images and data files into compact Markdown for AI 
 
 **Tech stack:** Python · pdfplumber · Tesseract · Streamlit · FastAPI · Docker
 
-**Results:** reading order 100% on 3 sample PDFs against 52% to 93% for markitdown; 40-record JSON from 1,412 (minified) to 716 estimated tokens (-49%); 89 tests and 49 corner cases pass. Samples are synthetic.
+**Results:** reading order 100% on 3 sample PDFs against 52% to 93% for markitdown; 40-record JSON from 1,416 (minified) to 716 estimated tokens (-49%); 131 tests and 49 corner cases pass. Samples are synthetic.
 
-**Links:** [Code](https://github.com/<GITHUB-USERNAME>/ai-document-analyst) · [Documentation](docs/00_index.md) · Live Demo: not deployed yet
+**Links:** [Code](https://github.com/<GITHUB-USERNAME>/ai-document-analyst) · [Documentation](docs/README.md) · Live Demo: not deployed yet
 
 ---
 
@@ -62,7 +62,7 @@ Converters return one shared `ConvertedDocument`; analysis and the three interfa
 - Implemented PDF layout inference from word geometry: row grouping, heading detection by font size, two-column gutter detection, ruled and rule-only tables, header and footer removal.
 - Built the image pipeline: preparation, multi-mode OCR selection, line and list reconstruction, confidence reporting.
 - Added data-file rendering (record lists to tables), compact mode and token-budget splitting.
-- Wrote the evaluation against markitdown, the 49-case corner-case script, 89 unit tests and the documentation set.
+- Wrote the evaluation against markitdown, the 49-case corner-case script, 131 unit tests and the documentation set.
 
 ## Challenges and learnings
 
@@ -82,8 +82,8 @@ Converters return one shared `ConvertedDocument`; analysis and the three interfa
 | Headings recovered as `#`, 3 PDFs | 22 of 22 | 0 of 22 | markitdown does not infer PDF headings |
 | Scanned PDF word recall | 99.1% | no text | Clean synthetic scan; markitdown has no OCR |
 | DOCX word recall and order | 100% / 100% | 100% / 100% | Near tie; headings 6/6 and 8/8 versus 5/6 and 7/8 |
-| 40-record JSON, estimated tokens | 2,600 / 1,412 / 822 / 716 | - | Indented / minified / readable / readable + compact |
-| Tests | 89 unit tests, 49 corner cases | - | Linux only |
+| 40-record JSON, estimated tokens | 2,600 / 1,416 / 822 / 716 | - | Indented / minified / readable / readable + compact |
+| Tests | 131 unit tests, 49 corner cases | - | Linux only |
 
 ![Fidelity](docs/assets/fidelity.png)
 
@@ -98,4 +98,4 @@ Not measured: savings against any chatbot's own file reader; real-document accur
 
 ---
 
-**Writing rule for this page:** README first, then trim. Every number above comes from `reports/fidelity.json`, `scripts/corner_cases.py` or the token example in [docs/08](docs/08_testing_and_reproduction.md).
+**Writing rule for this page:** README first, then trim. Every number above comes from `reports/fidelity.json`, `scripts/corner_cases.py` or the token example in [docs/08](docs/09_reproducibility_guide.md).
