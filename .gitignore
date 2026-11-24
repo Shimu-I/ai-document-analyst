@@ -12,3 +12,11 @@ dist/
 .streamlit/secrets.toml
 # your own converted files
 *.converted.md
+.venv/
+.update_backup_*/
+.update_log
+apply_update*.sh
+ai-document-analyst*.zip
+ai-document-analyst_v*/
+__pycache__/
+.pytest_cache/
