@@ -17,8 +17,10 @@ from pathlib import Path
 
 from .base import ConversionError, ConvertedDocument, clean_chars, tidy
 from .office import _decode, convert_csv, convert_docx, convert_pptx, convert_xlsx
+from .assets import AssetStore
 from .compact import compact_markdown, split_by_tokens
 from .image import convert_image
+from .picture_ocr import PictureOCR
 from .pdf import convert_pdf
 from . import structured
 
@@ -65,12 +67,15 @@ def _via_libreoffice(data: bytes, ext: str, target: str) -> bytes:
 
 def convert(data: bytes, filename: str, *, page_markers: bool = False, strip_repeated: bool = True,
             force_ocr: bool = False, compact: bool = False, json_mode: str = "readable",
-            ocr_lang: str | None = None) -> ConvertedDocument:
+            ocr_lang: str | None = None, assets: bool = False,
+            ocr_pictures: bool = False) -> ConvertedDocument:
     """Convert file bytes to Markdown. Raises ConversionError for unsupported/corrupt files.
 
     compact    remove padding/alignment rows in tables, comments, repeated spaces, and empty JSON values
     json_mode  "readable" (tables and key: value lines, fewer tokens) or "minified" (exact JSON, no whitespace)
     ocr_lang   Tesseract language(s), e.g. "eng+ben" (default: OCR_LANG environment variable, else English)
+    ocr_pictures  read the text inside pictures (slides saved as images, screenshots in Word, PDF figures)
+    assets     save pictures, diagrams and equations as image files (``doc.assets``), linked from the Markdown
     """
     if not data:
         raise ConversionError("empty file")
@@ -78,15 +83,17 @@ def convert(data: bytes, filename: str, *, page_markers: bool = False, strip_rep
         raise ConversionError("json_mode must be 'readable' or 'minified'")
     ext = Path(filename or "").suffix.lower()
     dkw = {"json_mode": json_mode, "compact": compact}
+    store = AssetStore(filename) if assets else None
+    pocr = PictureOCR(ocr_lang) if ocr_pictures and ext in (".pdf", ".docx", ".pptx", ".doc", ".ppt", ".odt", ".odp", ".rtf") else None
     if ext == ".pdf":
         doc = convert_pdf(data, filename, page_markers=page_markers, strip_repeated=strip_repeated,
-                          force_ocr=force_ocr)
+                          force_ocr=force_ocr, store=store, pocr=pocr)
     elif ext == ".docx":
-        doc = convert_docx(data, filename)
+        doc = convert_docx(data, filename, store=store, pocr=pocr)
     elif ext in (".xlsx", ".xlsm"):
         doc = convert_xlsx(data, filename)
     elif ext == ".pptx":
-        doc = convert_pptx(data, filename)
+        doc = convert_pptx(data, filename, store=store, pocr=pocr)
     elif ext in (".csv", ".tsv"):
         doc = convert_csv(data, filename)
         doc.source_chars = len(_decode(data))
@@ -115,7 +122,7 @@ def convert(data: bytes, filename: str, *, page_markers: bool = False, strip_rep
         raise structured.google_pointer_error(ext)
     elif ext in LEGACY:
         target, fn = LEGACY[ext]
-        doc = fn(_via_libreoffice(data, ext, target), filename)
+        doc = fn(_via_libreoffice(data, ext, target), filename, **({"store": store, "pocr": pocr} if target != "xlsx" else {}))
         doc.warnings.append(f"converted from {ext} through LibreOffice first")
     else:
         raise ConversionError(f"unsupported file type {ext or '(none)'}; supported: {', '.join(SUPPORTED)}")

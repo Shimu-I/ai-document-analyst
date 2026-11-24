@@ -7,7 +7,10 @@ import re
 import time
 from datetime import date, datetime, time as dtime
 
+from .assets import AssetStore, alt_text
+from .picture_ocr import PictureOCR, quote
 from .base import ConversionError, ConvertedDocument, clean_chars, md_table, tidy
+from .omml import omml_to_latex
 
 MAX_SHEET_ROWS = 5000
 MAX_SHEET_COLS = 60
@@ -29,17 +32,28 @@ def _run_md(text: str, bold: bool, italic: bool) -> str:
     return lead + core + trail
 
 
-def _para_md(p, plain: bool = False) -> str:
+def _para_md(p, plain: bool = False, math: list | None = None) -> str:
+    """Paragraph text with bold/italic/links. ``math``: when a list is given, equations become $..$ /
+    $$..$$ LaTeX in the text (and are appended to the list); otherwise they are left out."""
     from docx.text.hyperlink import Hyperlink
+    from docx.text.run import Run
 
     parts: list[str] = []
-    for r in p.iter_inner_content():
-        if isinstance(r, Hyperlink):
-            txt = clean_chars(r.text)
-            parts.append(f"[{txt}]({r.url})" if r.url and txt.strip() else txt)
-        else:
+    for child in p._p.iterchildren():
+        tag = child.tag.rsplit("}", 1)[-1]
+        if tag == "r":
+            r = Run(child, p)
             txt = clean_chars(r.text)
             parts.append(txt if plain else _run_md(txt, bool(r.bold), bool(r.italic)))
+        elif tag == "hyperlink":
+            r = Hyperlink(child, p)
+            txt = clean_chars(r.text)
+            parts.append(f"[{txt}]({r.url})" if r.url and txt.strip() else txt)
+        elif tag in ("oMath", "oMathPara") and math is not None:
+            tex = omml_to_latex(child)
+            if tex:
+                math.append(tex)
+                parts.append(f" $${tex}$$ " if tag == "oMathPara" else f"${tex}$")
     s = "".join(parts)
     # merge adjacent same-format spans produced run by run:  **a****b** -> **ab**
     s = re.sub(r"\*\*\*\*(?!\*)", "", s) if not plain else s
@@ -88,7 +102,41 @@ def _num_format(doc, p) -> tuple[str, int]:
     return kind, level
 
 
-def convert_docx(data: bytes, filename: str = "document.docx") -> ConvertedDocument:
+def _para_pictures(doc, p, store: AssetStore | None, pocr: PictureOCR | None = None) -> list[str]:
+    """Markdown image lines for the pictures anchored in a paragraph."""
+    blips = [e for e in p._p.iter() if isinstance(e.tag, str) and e.tag.endswith("}blip")]
+    lines = []
+    for b in blips:
+        rid = b.get("{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed")
+        if (store is None and pocr is None) or not rid:
+            continue
+        try:
+            part = doc.part.related_parts[rid]
+            ext = part.partname.ext.lower().lstrip(".")
+            if ext not in ("png", "jpg", "jpeg", "gif"):
+                continue                                  # EMF/WMF and similar cannot be shown by Markdown viewers
+            if store is None:
+                txt = pocr.read(part.blob)
+                if txt:
+                    lines.append(quote(txt))
+                continue
+            descr = ""
+            for e in p._p.iter():
+                if isinstance(e.tag, str) and e.tag.endswith("}docPr") and e.get("descr"):
+                    descr = e.get("descr")
+            path = store.add("img", part.blob, ext)
+            if path:
+                lines.append(f"![Picture {store.count('img')}{': ' + alt_text(descr) if descr else ''}]({path})")
+            txt = pocr.read(part.blob) if pocr is not None else ""
+            if txt:
+                lines.append(quote(txt))
+        except Exception:
+            continue
+    return lines
+
+
+def convert_docx(data: bytes, filename: str = "document.docx", store: AssetStore | None = None,
+                 pocr: PictureOCR | None = None) -> ConvertedDocument:
     import docx
     from docx.table import Table
     from docx.text.paragraph import Paragraph
@@ -101,7 +149,7 @@ def convert_docx(data: bytes, filename: str = "document.docx") -> ConvertedDocum
 
     blocks: list[str] = []
     title: str | None = None
-    n_tables = 0
+    n_tables = n_formulas = 0
     counters: dict[int, int] = {}
     prev_list = False
     # If the file has a Title paragraph, Heading 1 becomes "##" so the title stays the only "#".
@@ -113,9 +161,17 @@ def convert_docx(data: bytes, filename: str = "document.docx") -> ConvertedDocum
         if tag == "p":
             p = Paragraph(child, doc)
             style = (p.style.name or "") if p.style is not None else ""
-            text = _para_md(p)
+            eqs: list[str] = []
+            text = _para_md(p, math=eqs)
             plain = _para_md(p, plain=True)
+            pics = _para_pictures(doc, p, store, pocr)
+            n_formulas += len(eqs)
+            if not plain and eqs:
+                plain = " ".join(eqs)
             if not plain:
+                if pics:
+                    blocks.extend(pics)
+                    prev_list = False
                 continue
             m = re.match(r"heading (\d)", style, re.I)
             if style.lower() == "title" or m:
@@ -147,7 +203,8 @@ def convert_docx(data: bytes, filename: str = "document.docx") -> ConvertedDocum
             prev_list = False
             if style.lower() == "subtitle":
                 text = f"*{plain}*"
-            blocks.append(text)
+            blocks.append(text.strip())
+            blocks.extend(pics)
         elif tag == "tbl":
             tbl = Table(child, doc)
             rows = []
@@ -164,9 +221,19 @@ def convert_docx(data: bytes, filename: str = "document.docx") -> ConvertedDocum
             prev_list = False
     images = len(doc.inline_shapes)
     warnings = []
-    if images:
+    if store is not None:
+        images = max(0, images - store.count("img"))
+        if images:
+            warnings.append(f"{images} picture(s) could not be saved (unsupported format such as EMF/WMF, or limit reached)")
+    elif pocr is not None:
+        images = max(0, images - pocr.read_count)
+        if images:
+            warnings.append(f"{images} picture(s) had no readable text and were omitted")
+    elif images:
         warnings.append(f"{images} image(s) omitted: only text is converted")
     warnings.append("headers, footers, footnotes and text boxes are not included")
+    if pocr is not None:
+        warnings.extend(pocr.note())
     md = tidy("\n\n".join(blocks))
     if not md.strip():
         warnings.append("no text found in this document")
@@ -174,7 +241,9 @@ def convert_docx(data: bytes, filename: str = "document.docx") -> ConvertedDocum
         title = (doc.core_properties.title or "").strip() or None
     return ConvertedDocument(filename, "docx", md, title=title, tables=n_tables, images_omitted=images,
                              warnings=warnings, seconds=round(time.perf_counter() - t0, 3),
-                             size_bytes=len(data))
+                             size_bytes=len(data), formulas=n_formulas,
+                             assets=dict(store.files) if store is not None else {},
+                             figures=store.count("img") if store is not None else 0)
 
 
 # =========================================================================== XLSX
@@ -326,7 +395,8 @@ def _chart_md(chart) -> str:
         return ""
 
 
-def convert_pptx(data: bytes, filename: str = "slides.pptx") -> ConvertedDocument:
+def convert_pptx(data: bytes, filename: str = "slides.pptx", store: AssetStore | None = None,
+                 pocr: PictureOCR | None = None) -> ConvertedDocument:
     from pptx import Presentation
     from pptx.enum.shapes import MSO_SHAPE_TYPE, PP_PLACEHOLDER
 
@@ -350,7 +420,26 @@ def convert_pptx(data: bytes, filename: str = "slides.pptx") -> ConvertedDocumen
             if title_shape is not None and sh.shape_id == title_shape.shape_id:
                 continue
             if sh.shape_type == MSO_SHAPE_TYPE.PICTURE:
-                images += 1
+                saved = False
+                try:
+                    blob, ext = sh.image.blob, (sh.image.ext or "").lower()
+                except Exception:
+                    blob, ext = None, ""
+                if store is not None and blob and ext in ("png", "jpg", "jpeg", "gif"):
+                    path = store.add("img", blob, ext, tag=f"s{no}_")
+                    if path:
+                        descr = sh._element.xpath(".//p:cNvPr/@descr")
+                        blocks.append(f"![Picture {store.count('img')}"
+                                      f"{': ' + alt_text(descr[0]) if descr and not re.search(r'\.(png|jpe?g|gif)$', descr[0], re.I) else ''}]({path})")
+                        saved = True
+                read = False
+                if pocr is not None and blob and ext in ("png", "jpg", "jpeg", "gif", "bmp", "tiff", "tif"):
+                    txt = pocr.read(blob)
+                    if txt:
+                        blocks.append(quote(txt))
+                        read = True
+                if not saved and not read:
+                    images += 1
                 continue
             if getattr(sh, "has_chart", False) and sh.has_chart:
                 md = _chart_md(sh.chart)
@@ -388,9 +477,16 @@ def convert_pptx(data: bytes, filename: str = "slides.pptx") -> ConvertedDocumen
             if notes:
                 blocks.append("> **Notes:** " + notes.replace("\n", "\n> "))
     if images:
-        warnings.append(f"{images} picture(s) omitted: only text is converted")
+        warnings.append(f"{images} picture(s) omitted: " + ("unsupported format or limit reached"
+                                                           if store is not None else
+                                                           "no readable text" if pocr is not None else
+                                                           "only text is converted"))
+    if pocr is not None:
+        warnings.extend(pocr.note())
     md = tidy("\n\n".join(blocks))
     title = deck_title or (prs.core_properties.title or "").strip() or None
     return ConvertedDocument(filename, "pptx", md, title=title, pages=len(prs.slides), tables=n_tables,
                              images_omitted=images, warnings=warnings,
-                             seconds=round(time.perf_counter() - t0, 3), size_bytes=len(data))
+                             seconds=round(time.perf_counter() - t0, 3), size_bytes=len(data),
+                             assets=dict(store.files) if store is not None else {},
+                             figures=store.count("img") if store is not None else 0)

@@ -57,7 +57,7 @@ def prose(md: str) -> str:
         if line.startswith("```"):
             in_code = not in_code
             continue
-        if in_code or line.lstrip().startswith(("|", "#", "<!--", ">")):
+        if in_code or line.lstrip().startswith(("|", "#", "<!--", ">", "![")):   # "![" = saved figure/equation
             continue
         t = re.sub(r"!?\[([^\]]*)\]\([^)]*\)", r"\1", line)
         t = re.sub(r"[*_`]+", "", t).strip()

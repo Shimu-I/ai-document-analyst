@@ -12,7 +12,7 @@ Pipeline (all offline, pdfplumber + Tesseract):
    monospace code line, or paragraph text; wrapped lines are re-joined and
    end-of-line hyphenation is repaired.
 
-Known limits are listed in docs/02_conversion_notes.md (tables without ruling lines
+Known limits are listed in docs/deep_dive/conversion_notes.md (tables without ruling lines
 come out as text, images are omitted, maths is plain text).
 """
 from __future__ import annotations
@@ -24,6 +24,7 @@ import time
 from collections import Counter
 from dataclasses import dataclass
 
+from .pdf_special import extract_special
 from .base import CID_RE, ConversionError, ConvertedDocument, clean_chars, md_table, tidy
 
 BULLET_RE = re.compile(r"^([•●▪◦‣•●▪◦\-–—*])\s+(.+)$")
@@ -334,7 +335,8 @@ def _ocr_blocks(text: str) -> list[str]:
 
 # ------------------------------------------------------------------ main
 def convert_pdf(data: bytes, filename: str = "document.pdf", *, page_markers: bool = False,
-                strip_repeated: bool = True, force_ocr: bool = False) -> ConvertedDocument:
+                strip_repeated: bool = True, force_ocr: bool = False, store=None, pocr=None) -> ConvertedDocument:
+    """store: an AssetStore; when given, figures, diagrams and display equations are saved as images."""
     import pdfplumber
 
     t0 = time.perf_counter()
@@ -406,6 +408,15 @@ def convert_pdf(data: bytes, filename: str = "document.pdf", *, page_markers: bo
                 return any(t.x0 - 1 <= cx <= t.x1 + 1 and t.top - 1 <= cy <= t.bottom + 1 for t in table_items)
 
             words = [w for w in words if not in_table(w)]
+            special: list[Item] = []
+            if store is not None:
+                try:
+                    found, words = extract_special(page, words, [(t.x0, t.top, t.x1, t.bottom) for t in table_items],
+                                                   store, _rows, pno, pocr)
+                    for kind, b, md_text in found:
+                        special.append(Item("block", pno, b[1], b[3], b[0], b[2], md_text, page_height=H))
+                except Exception as e:      # a damaged drawing must not stop the text from converting
+                    warnings.append(f"page {pno}: figures and equations could not be extracted ({e})")
             rows = _rows(words)
             gutter = _detect_gutter(rows, W)
             page_items: list[Item] = []
@@ -431,14 +442,22 @@ def convert_pdf(data: bytes, filename: str = "document.pdf", *, page_markers: bo
                     page_items.append(_line_from_words(left, pno, 0, H))
                 else:
                     page_items.append(_line_from_words(right, pno, 1, H))
-            for t in table_items:
+            for t in table_items + special:
                 if gutter and (t.x1 <= gutter[0] + 2 or t.x0 >= gutter[1] - 2):
                     t.col = 0 if t.x1 <= gutter[0] + 2 else 1
                 page_items.append(t)
             items.extend(_order(page_items))
             items.extend(rotated_blocks)     # margin stamps etc.: after the page's normal text
 
-    if n_images:
+    if pocr is not None:
+        warnings.extend(pocr.note())
+    if store is not None:
+        if store.skipped:
+            warnings.append(f"{store.skipped} more figure(s) or equation(s) were found but not saved "
+                            f"(limit of {store.limit} per document)")
+        if n_images and not store.count("fig"):
+            warnings.append(f"{n_images} image(s) could not be saved as pictures (too small or page backgrounds)")
+    elif n_images:
         warnings.append(f"{n_images} image(s) omitted: only text is converted")
     if n_rotated:
         warnings.append(f"{n_rotated} line(s) of vertical text (margin stamps, rotated labels) were moved to "
@@ -470,7 +489,10 @@ def convert_pdf(data: bytes, filename: str = "document.pdf", *, page_markers: bo
                              title=title_from_md or (clean_chars(str(meta_title)).strip() if meta_title else None),
                              pages=n_pages, tables=n_tables, images_omitted=n_images, ocr_pages=n_ocr,
                              headers_footers_removed=removed, warnings=warnings,
-                             seconds=round(time.perf_counter() - t0, 3), size_bytes=len(data))
+                             seconds=round(time.perf_counter() - t0, 3), size_bytes=len(data),
+                             assets=dict(store.files) if store is not None else {},
+                             figures=store.count("fig") if store is not None else 0,
+                             formulas=store.count("eq") if store is not None else 0)
 
 
 def _norm(t: str) -> str:

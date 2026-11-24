@@ -13,6 +13,7 @@ What is done beyond a bare ``image_to_string``:
 """
 from __future__ import annotations
 
+import functools
 import io
 import os
 import re
@@ -31,8 +32,22 @@ LOW_CONF = 60            # words below this are named in the warning
 WARN_MEAN_CONF = 85      # mean confidence below this produces a warning
 
 
+@functools.lru_cache(maxsize=1)
+def _installed_langs() -> frozenset:
+    try:
+        import pytesseract
+        return frozenset(pytesseract.get_languages(config=""))
+    except Exception:
+        return frozenset()
+
+
 def ocr_lang(explicit: str | None = None) -> str:
-    return explicit or os.getenv("OCR_LANG") or "eng"
+    """Language codes for Tesseract. ``auto`` (the default) reads English and, when its language pack is
+    installed, Bengali too (``eng+ben``): Tesseract then picks the right script word by word."""
+    lang = (explicit or os.getenv("OCR_LANG") or "auto").strip()
+    if lang.lower() == "auto":
+        return "eng+ben" if "ben" in _installed_langs() else "eng"
+    return lang
 
 
 def _imports():
@@ -132,24 +147,68 @@ def _lines(words):
     return out
 
 
-def layout_to_markdown(words) -> str:
-    """Rebuild paragraphs, lists and headings from word positions."""
+BULLET_MISREADS = {"e", "o", "¢", "€", "«", "®", "©", "»", "°", "+", "~", "•", "●", "▪", "*", "-", "—", "–"}
+
+
+def _bullet_start(ln) -> str | None:
+    """Text after a bullet mark, when the line starts with one. OCR often reads a round bullet as 'e', 'o',
+    '¢' or '«', so a lone mark before a capitalised word counts as a bullet."""
+    ws = ln["words"]
+    nxt = ws[1]["text"][:1] if len(ws) >= 2 else ""
+    # "capitalised word" for Latin text; scripts without capitals (Bengali and others) count when the next word is a letter
+    if nxt and ws[0]["text"] in BULLET_MISREADS and (nxt.isupper() or (nxt.isalpha() and nxt.upper() == nxt.lower())):
+        return " ".join(w["text"] for w in ws[1:])
+    return None
+
+
+def _layout(words) -> list[list[dict]]:
     lines = _lines(words)
     if not lines:
-        return ""
+        return []
     body_h = statistics.median(l["h"] for l in lines)
     right_max = max(l["right"] for l in lines)
-    blocks: list[str] = []
+    bullets = {id(l): _bullet_start(l) for l in lines}
+    # Slides: OCR often drops the round bullet completely. When some lines clearly are bullets and nearly every
+    # line is short and of the same height, the lines without a mark are bullets too.
+    marked = [l for l in lines if bullets[id(l)] is not None or LIST_BUL_RE.match(l["text"])]
+
+    def _short(l):
+        return len(l["words"]) <= 10 and not re.search(r"[.:;!?]$", l["text"])
+    if marked and sum(_short(l) for l in lines) >= 0.8 * len(lines):
+        for l in lines:
+            if (bullets[id(l)] is None and not LIST_BUL_RE.match(l["text"]) and not LIST_NUM_RE.match(l["text"])
+                    and _short(l) and 0.75 * body_h <= l["h"] < 1.45 * body_h):
+                bullets[id(l)] = l["text"]
+                l["nomark"] = True          # the bullet itself was not read: its text starts one bullet-width further right
+    # width of "bullet + space", measured on lines where the bullet was read; otherwise about one line height
+    mw = [l["words"][1]["left"] - l["words"][0]["left"] for l in lines
+          if len(l["words"]) >= 2 and l["words"][0]["text"] in BULLET_MISREADS and bullets[id(l)] is not None
+          and not l.get("nomark")]
+    marker_w = statistics.median(mw) if mw else 0.9 * body_h
+
+    def eff(l):
+        return l["left"] - (marker_w if l.get("nomark") else 0)
+    lefts = [eff(l) for l in lines if bullets[id(l)] is not None or LIST_BUL_RE.match(l["text"])
+             or LIST_NUM_RE.match(l["text"])]
+    list_base = min(lefts) if lefts else 0
+    blocks: list[list[dict]] = []    # each block: list of entries {md, bbox, kind}
     kind: str | None = None          # "para" | "list": the block being built
-    cur: list[str] = []
+    cur: list[dict] = []
     prev = None
 
     def flush():
         nonlocal kind
         if cur:
-            blocks.append("\n".join(cur))
+            blocks.append(list(cur))
         cur.clear()
         kind = None
+
+    def box(ln):
+        return (ln["left"], ln["top"], ln["right"], ln["bottom"])
+
+    def merge(entry, ln):
+        l, t_, r, b = entry["bbox"]
+        entry["bbox"] = (min(l, ln["left"]), min(t_, ln["top"]), max(r, ln["right"]), max(b, ln["bottom"]))
 
     for ln in lines:
         text = clean_chars(ln["text"])
@@ -161,25 +220,40 @@ def layout_to_markdown(words) -> str:
                      and not re.search(r"[.:;!?]$", prev["text"])
                      and not LABEL_RE.match(text))          # "Date: ..." starts a new line, it does not wrap
         m_num, m_bul = LIST_NUM_RE.match(text), LIST_BUL_RE.match(text)
-        if m_num or m_bul:
+        mis = bullets[id(ln)] if not (m_num or m_bul) else None
+        if m_num or m_bul or mis is not None:
             if kind != "list":
                 flush()
                 kind = "list"
-            cur.append(f"{m_num.group(1)}. {m_num.group(2)}" if m_num else f"- {m_bul.group(1)}")
+            level = max(0, round((eff(ln) - list_base) / (2.0 * body_h)))      # indentation = nesting
+            cur.append({"md": "  " * level + (f"{m_num.group(1)}. {m_num.group(2)}" if m_num else
+                                              f"- {m_bul.group(1)}" if m_bul else f"- {clean_chars(mis)}"),
+                        "bbox": box(ln), "kind": "bullet", "level": level})
         elif ln["h"] >= 1.45 * body_h and len(text.split()) <= 12:
             flush()
-            blocks.append(f"## {text}")
+            blocks.append([{"md": f"## {text}", "bbox": box(ln), "kind": "heading", "level": 0}])
         elif kind in ("para", "list") and cur and continues:
-            cur[-1] += " " + text
+            cur[-1]["md"] += " " + text
+            merge(cur[-1], ln)
         elif kind == "para" and not brk:
-            cur.append(text)
+            cur.append({"md": text, "bbox": box(ln), "kind": "text", "level": 0})
         else:
             flush()
             kind = "para"
-            cur.append(text)
+            cur.append({"md": text, "bbox": box(ln), "kind": "text", "level": 0})
         prev = ln
     flush()
-    return "\n\n".join(blocks)
+    return blocks
+
+
+def layout_to_markdown(words) -> str:
+    """Rebuild paragraphs, lists and headings from word positions."""
+    return "\n\n".join("\n".join(e["md"] for e in blk) for blk in _layout(words))
+
+
+def layout_entries(words) -> list[dict]:
+    """The same layout as a flat list of {md, bbox (pixels), kind, level}, for linking text to the picture."""
+    return [e for blk in _layout(words) for e in blk]
 
 
 def convert_image(data: bytes, filename: str, lang: str | None = None) -> ConvertedDocument:

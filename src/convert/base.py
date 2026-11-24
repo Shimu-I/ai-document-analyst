@@ -27,6 +27,9 @@ class ConvertedDocument:
     image_tokens_est: int | None = None     # rough cost of sending the image itself (width x height / 750)
     source_chars: int | None = None         # characters of the original text, for text-like formats only
     compact_saved_chars: int = 0            # characters removed by compact mode
+    assets: dict[str, bytes] = field(default_factory=dict)   # image files referenced from the Markdown
+    figures: int = 0                        # pictures / diagrams saved as images
+    formulas: int = 0                       # equations kept (as LaTeX text or as images)
 
     @property
     def words(self) -> int:

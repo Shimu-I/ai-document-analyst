@@ -4,6 +4,7 @@ from __future__ import annotations
 import io
 import os
 import re
+import time
 import zipfile
 from dataclasses import asdict
 from pathlib import Path
@@ -46,11 +47,16 @@ def with_summary(markdown: str, analysis: dict[str, Any], filename: str) -> str:
 def process(data: bytes, filename: str, *, page_markers: bool = False, strip_repeated: bool = True,
             force_ocr: bool = False, use_llm: bool | None = None, compact: bool = False,
             json_mode: str = "readable", ocr_lang: str | None = None,
-            max_tokens: int | None = None) -> dict[str, Any]:
+            max_tokens: int | None = None, assets: bool = False,
+            ocr_pictures: bool = False) -> dict[str, Any]:
     """Convert one file and analyse it. Returns a JSON-ready dict.
 
+    ocr_pictures: read the text inside pictures with OCR (image-based slides, screenshots, PDF figures).
     max_tokens: when set, ``output_files(result)`` splits the Markdown into parts of about that many tokens.
+    assets: save pictures, diagrams and equations as image files; they are returned under the private key
+    ``_assets`` ({name: bytes}) so that the dict stays JSON-ready once that key is removed (see ``public``).
     """
+    t_start = time.perf_counter()
     if max_tokens is not None and max_tokens < 200:
         raise ServiceError(422, "max_tokens must be at least 200")
     if not data:
@@ -59,7 +65,8 @@ def process(data: bytes, filename: str, *, page_markers: bool = False, strip_rep
         raise ServiceError(413, f"file larger than {MAX_UPLOAD_BYTES // (1024 * 1024)} MB")
     try:
         doc = convert(data, filename, page_markers=page_markers, strip_repeated=strip_repeated,
-                      force_ocr=force_ocr, compact=compact, json_mode=json_mode, ocr_lang=ocr_lang)
+                      force_ocr=force_ocr, compact=compact, json_mode=json_mode, ocr_lang=ocr_lang,
+                      assets=assets, ocr_pictures=ocr_pictures)
     except ConversionError as e:
         msg = str(e)
         raise ServiceError(415 if msg.startswith("unsupported") else 422, msg) from e
@@ -77,10 +84,18 @@ def process(data: bytes, filename: str, *, page_markers: bool = False, strip_rep
                   "headers_footers_removed": doc.headers_footers_removed, "seconds": doc.seconds,
                   "size_bytes": doc.size_bytes, "source_tokens": doc.source_tokens,
                   "ocr_confidence": doc.ocr_confidence, "image_tokens_est": doc.image_tokens_est,
-                  "compact_saved_chars": doc.compact_saved_chars},
+                  "compact_saved_chars": doc.compact_saved_chars, "figures": doc.figures,
+                  "formulas": doc.formulas, "asset_files": sorted(doc.assets)},
         "max_tokens": max_tokens,
+        "elapsed": round(time.perf_counter() - t_start, 3),
+        "_assets": dict(doc.assets),
         "warnings": doc.warnings + an["warnings"],
     }
+
+
+def public(r: dict[str, Any]) -> dict[str, Any]:
+    """The result without private keys (image bytes), safe to send as JSON."""
+    return {k: v for k, v in r.items() if not k.startswith("_")}
 
 
 def output_files(r: dict[str, Any], include_summary: bool = False) -> list[tuple[str, str]]:
@@ -107,4 +122,7 @@ def zip_results(results: list[dict[str, Any]], include_summary: bool = False) ->
             for name, text in files:
                 used.add(name)
                 z.writestr(name, text)
+            for name, blob in (r.get("_assets") or {}).items():     # image files; names are unique per document
+                if f"assets/{name}" not in z.namelist():
+                    z.writestr(f"assets/{name}", blob)
     return buf.getvalue()

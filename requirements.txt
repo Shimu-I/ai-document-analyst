@@ -12,7 +12,7 @@ PyYAML>=6.0               # .yaml / .yml
 requests>=2.31
 
 # --- web page and API ---
-streamlit>=1.33
+streamlit>=1.36              # st.navigation (multi-page app)
 fastapi>=0.110
 uvicorn>=0.29
 python-multipart>=0.0.9   # file uploads in FastAPI

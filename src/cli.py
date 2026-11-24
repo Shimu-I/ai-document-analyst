@@ -7,6 +7,8 @@
     python -m src.cli screenshot.png                              # image -> text (OCR)
     python -m src.cli data.json --compact                         # fewer tokens: no empty values, tighter tables
     python -m src.cli big.pdf --max-tokens 6000                   # split into parts that fit a chat window
+    python -m src.cli slides.pptx --pictures-ocr                  # also read text that is inside pictures
+    python -m src.cli paper.pdf --images                          # keep figures and equations as images in assets/
     python -m src.cli bangla.png --lang ben                       # other OCR language (install tesseract-ocr-ben)
 """
 from __future__ import annotations
@@ -72,7 +74,11 @@ def main(argv: list[str] | None = None) -> int:
                     help="split the output into parts of about N tokens (breaks before headings)")
     ap.add_argument("--json", choices=["readable", "minified"], default="readable", dest="json_mode",
                     help="JSON/YAML/XML output: readable tables and key: value lines (default) or exact minified JSON")
-    ap.add_argument("--lang", help="OCR language(s) for images and scanned PDFs, e.g. eng, ben, eng+ben")
+    ap.add_argument("--images", action="store_true",
+                    help="save pictures, diagrams and equations as image files in an assets/ folder next to the .md")
+    ap.add_argument("--pictures-ocr", action="store_true",
+                    help="read the text inside pictures with OCR (slides saved as images, screenshots in Word, PDF figures)")
+    ap.add_argument("--lang", help="OCR language(s) for images and scanned PDFs, e.g. eng, ben, eng+ben (default: auto = English, plus Bengali when installed)")
     a = ap.parse_args(argv)
 
     files = collect(a.paths)
@@ -89,7 +95,7 @@ def main(argv: list[str] | None = None) -> int:
             r = service.process(f.read_bytes(), f.name, page_markers=a.page_markers,
                                 strip_repeated=not a.keep_headers, force_ocr=a.ocr,
                                 use_llm=True if a.llm else False, compact=a.compact, json_mode=a.json_mode,
-                                ocr_lang=a.lang, max_tokens=a.max_tokens)
+                                ocr_lang=a.lang, max_tokens=a.max_tokens, assets=a.images and not a.stdout, ocr_pictures=a.pictures_ocr)
         except (service.ServiceError, OSError) as e:
             print(f"FAILED  {f}: {getattr(e, 'message', e)}", file=sys.stderr)
             failures += 1
@@ -103,6 +109,12 @@ def main(argv: list[str] | None = None) -> int:
             dest = destination(f, name, out_dir, taken)
             dest.write_text(text, encoding="utf-8")
             print(f"{f}  ->  {dest}   [{r['analysis']['doc_type']}, {st['words']:,} words, ~{service_tokens(text):,} tokens]")
+        if r["_assets"]:
+            adir = (out_dir or f.parent) / "assets"
+            adir.mkdir(parents=True, exist_ok=True)
+            for aname, blob in r["_assets"].items():
+                (adir / aname).write_bytes(blob)
+            print(f"    saved {len(r['_assets'])} image file(s) in {adir}")
         for w in r["warnings"]:
             print(f"    note: {w}")
     return 1 if failures else 0
