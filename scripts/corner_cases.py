@@ -3,7 +3,7 @@
     python scripts/corner_cases.py            # prints a Markdown table; exit code 1 if any case deviates
     python scripts/corner_cases.py --verbose  # also prints the first lines of each output
 
-Every case states the behaviour that docs/10_corner_cases_and_troubleshooting.md promises. A case is
+Every case states the behaviour that docs/deep_dive/corner_cases.md promises. A case is
 SKIPPED when a program it needs (tesseract, LibreOffice) is not installed; it is never silently passed.
 """
 from __future__ import annotations
