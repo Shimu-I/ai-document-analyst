@@ -661,13 +661,13 @@ Free hosting options and their limits are in [free deployment](deployment_free.m
 2. Connect and push:
 
 ```bash
-git remote add origin https://github.com/<GITHUB-USERNAME>/ai-document-analyst.git
+git remote add origin https://github.com/Shimu-I/ai-document-analyst.git
 git branch -M main
 git push -u origin main
 ```
 
 3. Authentication: HTTPS asks for a **personal access token** instead of a password (GitHub, Settings, Developer settings); or install the GitHub CLI and run `gh auth login`;
-   or add an SSH key and use the `git@github.com:<GITHUB-USERNAME>/ai-document-analyst.git` address.
+   or add an SSH key and use the `git@github.com:Shimu-I/ai-document-analyst.git` address.
 4. Add topics (`markdown`, `ocr`, `document-processing`, `llm-tools`, `token-optimization`) and a short description in the repository settings.
 5. Tag a release: `git tag -a v1.0.0 -m "First release" && git push --tags`.
 

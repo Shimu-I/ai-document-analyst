@@ -1,6 +1,6 @@
 <!--
 PORTFOLIO PAGE. Source of truth is README.md; this file is the trimmed, story-first version.
-Placeholders to fill: <GITHUB-USERNAME>, <AUTHOR NAME>, Live Demo link (none yet), UI screenshots.
+Placeholders to fill: Live Demo link (none yet), UI screenshots.
 -->
 
 # Part B1 - Portfolio overview card
@@ -23,7 +23,7 @@ Converts PDFs, Office files, images and data files into compact Markdown for AI 
 
 **Results:** reading order 100% on 3 sample PDFs against 52% to 93% for markitdown; 40-record JSON from 1,416 (minified) to 716 estimated tokens (-49%); 131 tests and 49 corner cases pass. Samples are synthetic.
 
-**Links:** [Code](https://github.com/<GITHUB-USERNAME>/ai-document-analyst) · [Documentation](docs/README.md) · Live Demo: not deployed yet
+**Links:** [Code](https://github.com/Shimu-I/ai-document-analyst) · [Documentation](docs/README.md) · Live Demo: not deployed yet
 
 ---
 
@@ -56,7 +56,7 @@ Converters return one shared `ConvertedDocument`; analysis and the three interfa
 
 ## My Contribution
 
-*(Adjust to what was actually written by hand versus adapted; this text is a starting point.)*
+*Owner: Shimu-I ([@Shimu-I](https://github.com/Shimu-I)). Built together with Claude (AI assistant by Anthropic), which wrote and tested code and documents under the owner's direction. Adjust this list to what was written by hand versus adapted.*
 
 - Designed the converter architecture and the shared `ConvertedDocument` interface.
 - Implemented PDF layout inference from word geometry: row grouping, heading detection by font size, two-column gutter detection, ruled and rule-only tables, header and footer removal.

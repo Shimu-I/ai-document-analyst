@@ -25,7 +25,7 @@ flowchart TD
 ```bash
 sudo apt update
 sudo apt install -y python3 python3-venv python3-pip tesseract-ocr git
-git clone https://github.com/<GITHUB-USERNAME>/ai-document-analyst.git
+git clone https://github.com/Shimu-I/ai-document-analyst.git
 cd ai-document-analyst
 python3 -m venv .venv
 source .venv/bin/activate

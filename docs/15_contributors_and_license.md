@@ -4,10 +4,10 @@
 
 | Name | Role | Responsibility |
 |---|---|---|
-| `<AUTHOR NAME>` (placeholder, to be filled in) | Project owner | Direction, review, publishing |
-| An AI assistant (Claude) | Development helper | Wrote and tested code and documents in the build sessions, under the owner's direction |
+| **Shimu-I** ([@Shimu-I](https://github.com/Shimu-I)) | Project owner | Idea, direction, review, testing on a real machine, publishing |
+| **Claude** (AI assistant by Anthropic) | Development partner | Wrote and tested code and documents in the build sessions, under the owner's direction |
 
-The owner's name and GitHub account are not recorded anywhere in the repository yet (`<AUTHOR NAME>` and `<GITHUB-USERNAME>` are placeholders in the README and portfolio page). Fill them in before publishing. Which parts were written by hand and which were adapted is for the owner to state; the portfolio page has a "My Contribution" section for it.
+Repository: <https://github.com/Shimu-I/ai-document-analyst>. Which parts were written by hand and which were adapted is for the owner to state; the portfolio page has a "My Contribution" section for it.
 
 ## Contributing
 
@@ -25,7 +25,7 @@ The project is a working prototype and accepts issues and pull requests once it 
 
 ## License
 
-The project is released under the **MIT License** (file `LICENSE`, copyright line "2026 AI Document Analyst contributors"). Third-party libraries keep their own licenses; see [14 References and Acknowledgements](14_references_and_acknowledgements.md). Before publishing, the copyright line can be changed to the owner's name.
+The project is released under the **MIT License** (file `LICENSE`, copyright line "2026 Shimu-I and Claude (AI assistant by Anthropic)"). Third-party libraries keep their own licenses; see [14 References and Acknowledgements](14_references_and_acknowledgements.md).
 
 ---
 Previous: [14 References and Acknowledgements](14_references_and_acknowledgements.md) · Back to [index](README.md)

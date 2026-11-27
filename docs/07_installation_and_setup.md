@@ -51,7 +51,7 @@ Windows: install Python from python.org and a Tesseract build, then add Tesserac
 ### 2. Get the project
 
 ```bash
-git clone https://github.com/<GITHUB-USERNAME>/ai-document-analyst.git
+git clone https://github.com/Shimu-I/ai-document-analyst.git
 cd ai-document-analyst
 ```
 

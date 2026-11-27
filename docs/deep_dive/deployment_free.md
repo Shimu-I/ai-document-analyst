@@ -135,7 +135,7 @@ Verify the current offer before starting. On a plain Ubuntu machine:
 
 ```bash
 sudo apt update && sudo apt install -y docker.io docker-compose-v2 git
-git clone https://github.com/<GITHUB-USERNAME>/ai-document-analyst.git && cd ai-document-analyst
+git clone https://github.com/Shimu-I/ai-document-analyst.git && cd ai-document-analyst
 sudo docker compose up -d --build ui
 ```
 

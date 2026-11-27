@@ -125,7 +125,7 @@ class ProjectStatusTests(unittest.TestCase):
             raise OSError("offline")
         self.assertEqual(repo_status("a/b", fetch=lambda r: {"pushed_at": "2026-01-01T00:00:00Z", "archived": True})["level"], "bad")
         self.assertEqual(repo_status("a/b", fetch=boom)["level"], "none")
-        self.assertEqual(repo_status("<GITHUB-USERNAME>/x", fetch=boom)["label"], "Open source")
+        self.assertEqual(repo_status("Shimu-I/x", fetch=boom)["label"], "Open source")
         self.assertEqual(repo_status("", fetch=boom)["level"], "none")
 
 
